@@ -4,7 +4,8 @@
 #include "game.h"
 
 void Game::M_00406540(int dx, int dy)
-{    int before, after;
+{
+    int before, after;
     int i, v, limit;
 
     before = M_00406350(DAT_00951fcc->m_14[0], DAT_00951fcc->m_14[1]);
