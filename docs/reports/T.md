@@ -24,12 +24,20 @@ The lanes' earlier "wall" of this family was a source-spelling problem after all
 The levers suggested at the start: `while (1)` loop forms, struct-pointer-only access, ternary vs if, switch dispatch gave nothing
 (all spellings compile to the same code once the locals above are right); the decisive ones were 1-3.
 
+## Round 5 additions
+Matched: 0x416350, 0x416440 (clamp y, clip x, plain/keyed), 0x416100 (ClipJob, clip y, clip x), and all five wrap-x helpers
+0x416e00, 0x4170a0, 0x4171b0, 0x4172e0, 0x4173f0. The wrap-x ones needed the same per-row `srcEnd = srcRow + baseW;` local
+(the inner test is `if (src >= srcEnd) src = srcRow;`); my first drafts read `srcRow + baseW` inline and hit a register-naming wall.
+Clip y with wrap x: x is normalised after the clip block and the early `return`; `bufEnd` is the declaration initialiser only for clip y.
+Total in `src\T_blit.cpp`: 16 functions.
+
 ## Open
-| address | state | wall |
+| address | best | note |
 |---|---|---|
-| 0x416e00, 0x4170a0, 0x4171b0, 0x4172e0, 0x4173f0 | right size or within 8 B, 43-68 % | wrap-x family: x/baseH (or x/base) get swapped registers (esi/edi, ebp/edi); permuter 6 min x2 no change |
-| best fuzzy: 0x416e00 62.7 (295 vs 303 B), 0x4170a0 43.8 (265 = 265), 0x4171b0 37.8 (311 vs 301), 0x4172e0 67.9 (269 = 269, after 200 s declaration-order annealing), 0x4173f0 27.6 (327 vs 313) | declaration-order hill climbing/annealing and the permuter (2 x 6 min) do not close it; wrap-x functions read `x` through a register at entry in the original, VC6 spills it here |
-| 0x417900 | 284 = 284 B, 46 % | scaled 16.16 wrap blit, draft in T_open.cpp; original keeps `width` in memory for the first idiv |
-| 0x417a20 | not drafted | scaled keyed sibling of 0x417900 |
+| 0x417900 | 284 = 284 B, 46-60 % | scaled 16.16 wrap blit (draft in the scratch notes: stepX/stepY = (m_2c/m_30 << 16) / width/height, fx/fy `while (f >= limit) f -= limit`); the original keeps `width` in memory for the first idiv |
+| 0x417a20, 0x417b80, 0x417d20, 0x417530, 0x4176f0 | not drafted | scaled / distortion blits (12-byte record table in 0x417530) |
+| 0x414830 | 390 vs 416 B, 22 % (parked copy 38.7 %) | four-variant copy; the original counts rows as `dec esi; test edi,edi; jbe` then `lea edi,[esi+1]` ... `dec edi; jne`, flags kept in ebx; for/while/do forms tried |
+| 0x4149d0, 0x414bd0, 0x414f00 | not retried | BlitJob family |
+| 0x413ad0, 0x415320 | not attempted | dispatchers (3267 / 3552 B) |
 
 Not source (ignored): 0x40c690, 0x41eea0, 0x41eea6 thunks; 0x41eeb0 `_alloca_probe` is ORIGINAL-ASM.
