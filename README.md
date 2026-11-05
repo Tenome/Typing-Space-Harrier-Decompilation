@@ -9,12 +9,12 @@ This repository contains no game files. You need your own copy of the game.
 
 | | |
 |---|---|
-| Game code (506 functions, 115,864 bytes) | **407 functions match** (80.4 %), 54,142 bytes (46.7 % of the code) |
+| Game code (506 functions, 115,864 bytes) | **412 functions match** (81.4 %), 56,791 bytes (49.0 % of the code) |
 | Initialised data | 771,252 bytes reproduced (generated from your exe, see below) |
 | C runtime (193 functions) | statically linked VC6 `libc.lib`, not decompiled |
 | Compiler | Visual C++ 6.0, cl 12.00.8168 (`/O2`), linker 6.00 |
 
-Open work: ~87 functions that differ only in register allocation or block layout, ~12 unstarted (mostly large, data-heavy
+Open work: ~85 functions that differ only in register allocation or block layout, ~9 unstarted (mostly large, data-heavy
 ones), the string-literal pool, the post-link junk bytes between functions, and the final link of the whole executable.
 See `docs/DECOMP_WORKFLOW.md` and `docs/reports/`. Time and token statistics for the work so far are in `docs/PROJECT_STATS.md` (regenerate with `python tools/usage_report.py`).
 
