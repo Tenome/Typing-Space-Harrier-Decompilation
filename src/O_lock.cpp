@@ -25,8 +25,8 @@ int FUN_00413350(IDirectDrawSurface *surf, unsigned char *dst, unsigned char fgI
         if (hr != DDERR_WASSTILLDRAWING)
             return 0;
     }
-    src = (unsigned char *)desc.lpSurface;
     rowSkip = desc.lPitch - desc.dwWidth;
+    src = (unsigned char *)desc.lpSurface;
     for (y = desc.dwHeight; y > 0; y--) {
         end = src + desc.dwWidth;
         while (src < end) {
