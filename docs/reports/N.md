@@ -49,3 +49,17 @@ Remaining best (instruction-diff score from the permuter scale; 0 = match):
 - 0x41d0d0: 30 (only `span = center - first` placement after the `steps` test differs).
 - 0x405bd0: 9, 0x406be0: 10, 0x4042a0: 14, 0x4013b0: 23 (permuter bests), 0x4076a0: 22, 0x4090a0: 24, 0x40bbe0: 25.
 - Not attempted: 0x40c340, 0x404490, 0x412400, 0x41c8a0, 0x403d80, 0x402f10 and the rest of the list below 0x405b80 (large or low fuzzy).
+
+## Third pass
+Matched additionally:
+| address | file | change |
+|---|---|---|
+| 0x41e190 | N_k.cpp | the four scalar clears first, then the two element-clear loops (independent statements reordered) |
+| 0x405b80 | N_l.cpp | real data model: `for (i = 0; table[i].kana[0] != 0; i++) { n = 0; for (k = 0; k < 4; k++) { if (table[i].rom[k][0] == 0) break; n = k + 1; } counts[i] = n; }` instead of pointer walking |
+| 0x406540 | N_m.cpp | `if (x == 1) {clamp} else {wrap}` written as `switch (x) { case 0: wrap; break; case 1: clamp; break; }` |
+| 0x4042a0 | N_n.cpp | flag `expired` (set when tick >= limit), condition inverted so the finish block comes first with `if (m_39c != 0) 0xb else 2`, counting block in the else |
+
+Lessons: model the loop semantics (separate counter, result assigned from counter+1) rather than the decompiler's pointer walk; a `dec/je` on a 0/1 selector is a switch; a hoisted `xor ebx,ebx` shared with an early zero store is a flag local; the block placed after `ret` is the else branch.
+
+Remaining best: 0x410c20 4, 0x4121a0 10, 0x4121f0 9 (needs `unsigned bit`), 0x40ba00 8, 0x406be0 about 10 (register naming only: count lands in edx, orig ecx; idx-- before p--, `unsigned value`), 0x4090a0 about 30 (ebx/edi swap, mode spilled), 0x40c340 28 with ones[12] (frame is 0x150 in the original; late `push edi`), 0x41d0d0 30, 0x40bc60 11, 0x4013b0 23.
+Not attempted or not reachable in the time: 0x404490, 0x412400, 0x41c8a0, 0x403d80, 0x402f10 and the D/H/I lanes' large functions (blit, MCI, DirectDraw): their parked sources are still far (fuzzy below 50).
