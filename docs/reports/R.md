@@ -52,3 +52,6 @@ Matched (src/R_clear2.cpp):
 
 Memset retried without a match: 0x41c8a0 (36 to 25 with memset on the 3-int clear, but the original keeps a hoisted zero in edi, so the explicit stores stay; remaining wall is the register rotation of the tail argument loads), 0x412ec0 (58 to 48; the original clears the palette with a pointer loop, not memset), 0x411340 (variable-size memset is a call, worse), 0x409e00 (no change; the original indexes `short DAT[c*2]` through `lea ecx,[eax+eax]`).
 Other tries without result: 0x4013b0 (original pushes esi only after the first test: the lazy callee-saved push seen in 4096b0 and 40c340), 0x4012a0, 0x40b140 (index form 73), permuter 10 min on 4012a0, 405c50, 403d80, 41d460, 41d0d0 (best 67, 126, 67, 55, 30).
+
+## Third session (lane T lever retried)
+No new matches. 0x4076a0 improved from 22 to 12 by indexing with a named base local: `first = len * 4;` after the clamp, loop `for (i = 0; i < 4; i++)` testing `percent <= DAT_004e1fdc[first + i]` (rest is the store timing of the `grade` spill after the flag test). 0x41d0d0: for/if-wrapped/while(n>0) forms of the second loop are far worse (64-73 vs 30). 0x41df40: hoisting `m_160` into a local gives 47; the original lays out the failure blocks before the MCI call (CFG). 0x4096b0, 0x4081b0, 0x4090a0, 0x40d850: no invariant sub-expression to name; for-init cursor forms unchanged.
