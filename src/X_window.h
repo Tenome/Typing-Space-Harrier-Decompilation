@@ -67,6 +67,8 @@ public:
     virtual int OnChar(WPARAM ch, LPARAM info);
     virtual int OnSysKeyUp(WPARAM key, LPARAM info) { return 1; }
     virtual int OnSysChar(WPARAM ch, LPARAM info) { return 1; }
+    virtual int OnKeyDown(WPARAM key, LPARAM info);
+    virtual int OnSysKeyDown(WPARAM key, LPARAM info);
     virtual int OnCreate();
     virtual void OnDestroy();
 };

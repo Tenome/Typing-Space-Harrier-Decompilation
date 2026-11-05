@@ -33,3 +33,5 @@ atexit	0041fa3b
 DAT_00a460a0	00a460a0
 DAT_00a46198	00a46198
 ?WindowProc@EzWindow@@UAEJIIJ@Z	0041e530
+?OnKeyDown@TypingWindow@@UAEHIJ@Z	0041dc20
+?OnSysKeyDown@TypingWindow@@UAEHIJ@Z	0041dd80
