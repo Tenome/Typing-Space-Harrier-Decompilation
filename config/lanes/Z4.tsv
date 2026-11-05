@@ -1,0 +1,16 @@
+address	name	size	note
+00409700	FUN_00409700	1435	
+0040dd60	FUN_0040dd60	1329	
+00413ad0	FUN_00413ad0	3267	best fuzzy 32.6 in src/V_open.cpp
+00415320	FUN_00415320	3552	
+00417530	FUN_00417530	447	best fuzzy 87.4 in src/V_open.cpp
+004176f0	FUN_004176f0	503	best fuzzy 51.2 in src/V_open.cpp
+00417900	FUN_00417900	284	
+00417a20	FUN_00417a20	345	
+00417d20	FUN_00417d20	441	
+004189d0	FUN_004189d0	1353	
+004193c0	FUN_004193c0	2728	
+00419e80	FUN_00419e80	2426	best fuzzy 52.2 in src/J_open.cpp
+0041a880	FUN_0041a880	1124	best fuzzy 59.3 in src/J_open.cpp
+0041aef0	FUN_0041aef0	6102	best fuzzy 40.3 in src/J_open.cpp
+0041d0d0	FUN_0041d0d0	737	best fuzzy 86.6 in src/J_open.cpp
