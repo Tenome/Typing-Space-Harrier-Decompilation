@@ -66,29 +66,29 @@ void FUN_00417530(DistortJob *job)
 // OPEN: 0x4176f0 keyed distortion blit, 459 vs 503 B. keys[srcRow[fx>>16]] twice (no c local) is closer than the c local; the original also spills step and reloads wrapW/keys into ebp each iteration (register pressure), so one more live value than mine.
 void FUN_004176f0(DistortJob *job)
 {
+    unsigned char *base = job->base;
+    int baseH = job->baseH;
+    int baseW = job->baseW;
+    DistortRow *row = job->table;
+    int basePitch = job->basePitch;
+    unsigned char *buf = job->buf;
+    int width = job->width;
+    int bufPitch = job->bufPitch;
+    int y = job->y;
     int rows = job->rows;
+    int x = job->x;
+    int *keys = job->keys;
+    int wrapW = baseW << 16;
+    int widthFixed = width << 16;
+    DistortRow *end;
+    int step;
+    unsigned char *dstRow;
+    unsigned char *dst;
     unsigned char *dstEnd;
     int sy;
-    int basePitch = job->basePitch;
-    unsigned char *dstRow;
-    int baseH = job->baseH;
-    int sx;
-    int x = job->x;
     int fx;
-    int wrapW = baseW << 16;
-    int width = job->width;
-    int *keys = job->keys;
+    int sx;
     unsigned char *srcRow;
-    int baseW = job->baseW;
-    unsigned char *buf = job->buf;
-    unsigned char *dst;
-    DistortRow *end;
-    unsigned char *base = job->base;
-    int widthFixed = width << 16;
-    int bufPitch = job->bufPitch;
-    DistortRow *row = job->table;
-    int step;
-    int y = job->y;
 
     if (y < 0)
         y += (1 - y / baseH) * baseH;
@@ -129,27 +129,27 @@ void FUN_004176f0(DistortJob *job)
 // OPEN: 0x417900 scaled 16.16 wrap blit, 291 vs 284 B. Original keeps width in the dead job slot for the first idiv and hoists x<<16 to a slot.
 void FUN_00417900(ScaledBlitJob *job)
 {
-    int y = job->m_28;
-    int x = job->x;
-    unsigned char *base = job->base;
-    unsigned char *dst;
-    int wrapH = baseH << 16;
-    unsigned char *dstEnd;
-    unsigned char *buf = job->buf;
-    int fy;
-    int baseW = job->baseW;
-    int rows = job->rows;
-    unsigned char *dstRow;
     int basePitch = job->basePitch;
-    int bufPitch = job->bufPitch;
-    int fx;
-    int wrapW = baseW << 16;
-    int stepY = (job->m_30 << 16) / rows;
-    int baseH = job->baseH;
-    unsigned char *srcRow;
-    int stepX = (job->m_2c << 16) / width;
-    unsigned char *bufEnd;
+    unsigned char *base = job->base;
+    unsigned char *buf = job->buf;
     int width = job->width;
+    int baseW = job->baseW;
+    int bufPitch = job->bufPitch;
+    int x = job->x;
+    int stepX = (job->m_2c << 16) / width;
+    int rows = job->rows;
+    int baseH = job->baseH;
+    int y = job->m_28;
+    int stepY = (job->m_30 << 16) / rows;
+    int wrapW = baseW << 16;
+    int wrapH = baseH << 16;
+    unsigned char *bufEnd;
+    unsigned char *dstRow;
+    unsigned char *dst;
+    unsigned char *dstEnd;
+    unsigned char *srcRow;
+    int fx;
+    int fy;
 
     if (y < 0)
         y += (1 - y / baseH) * baseH;
