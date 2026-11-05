@@ -5,5 +5,5 @@ int M_0040f720(int n);
 int M_0040cc70();
 int M_0040ca80();
 int M_0040d2c0(int index, int bank, int n, int a4);
-void M_0040d400(int index, int bank, int n, int flag, int a5);
+int M_0040d400(int index, int bank, int n, int flag, int a5);
 void M_0040c340();

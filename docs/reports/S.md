@@ -43,3 +43,13 @@ MATCH-PENDING: none.
 | others in `config/lanes/S.tsv` | not attempted: blit/DirectDraw/MCI/UI functions above 400 bytes (0x414830, 0x4149d0, 0x414bd0, 0x414f00, 0x4129a0, 0x412fe0, 0x4114d0, 0x418f70, 0x4185a0, 0x41a880, 0x419e80, 0x41aef0, 0x402310, 0x402730) and the small walls already documented in O.md |
 
 Permuter results this round (3 min, 6 workers each): 41adc0 30, 406be0 10, 4121f0 20, 40bbe0 13.
+
+## Session 2 (after merging master; T and R levers retried)
+Matched: 0x4169f0 (`src/S_read.cpp`): lane T's spelling (named `row`, `dstEnd`, `srcEnd` locals per row, both cursors in the for-init, `baseEnd` before `srcRow`) gave the byte match first try.
+Retried without a match:
+- 0x413870: pointer cursor `p` in the for-init next to `i` (`for (i = 0, p = DAT_004ebb34; p < DAT_004ebb34 + 0x48; i++, p++)`, `base += end - p[-1]`) reproduces the original esi/ebx induction pair (126 vs 130 B); all 120 declaration orders still 126; code/base register naming (edx/eax in the original) is what remains.
+- 0x406910: a named `obj = &DAT_009a629c[k]` local (assigned, then `DAT_00a3d6ec = obj`, then `if (DAT_00a3d6ec->m_0 != 0 && obj->m_8 > 0)`) moves the strength-reduced pointer to `m_8` as in the original; `count = m_0` first and `n > count` fix the head. Remaining 320 vs 309: the original reloads `DAT_00a3d6ec` after the `m_8 -= n` store (store through a pointer VC6 cannot prove distinct) while mine forwards the pointer register; `int *life` (from obj or from the array) did not break the forwarding.
+- 0x40a6d0: `memset(&m_3d8[5], 0, 16)` gives 191 B (the original has four separate reloading stores), so no.
+- 0x40d160: named `row = &DAT_004bde14[index * 0x16]` local: 337 vs 338 B (from 335), still no hoisted constant 1 in ebx.
+- 0x408660 (sound remap switch): writing the case values into the parameter `sound` instead of an `id` local changes nothing in the head; the original keeps `this` in esi (copied at entry because ecx is reloaded for `DAT_00a45e28`) and the parameter in eax; mine keeps the parameter in esi.
+- 0x4136f0, 0x4121f0, 0x41adc0, 0x406be0, 0x40bbe0, 0x4013b0, 0x406a80, 0x40cdd0: no change from the first session (no invariant sub-expression to name; no zero-run to turn into memset; 0x40cdd0 fills with -1 so memset does not apply).

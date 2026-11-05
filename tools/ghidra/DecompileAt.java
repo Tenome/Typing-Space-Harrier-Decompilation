@@ -30,7 +30,8 @@ public class DecompileAt extends GhidraScript {
                     continue;
                 }
                 DecompileResults results = decompiler.decompileFunction(function, 120, monitor);
-                out.println("// ==== " + currentProgram.getName() + " " + function.getName() + " @ " + address);
+                out.println("// ==== " + currentProgram.getName() + " " + function.getName() + " @ " + address
+                    + " | body " + function.getBody().getMinAddress() + "-" + function.getBody().getMaxAddress() + " bytes " + function.getBody().getNumAddresses());
                 out.println(results.decompileCompleted() ? results.getDecompiledFunction().getC() : "// failed: " + results.getErrorMessage());
             }
         }

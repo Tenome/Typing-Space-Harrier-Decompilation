@@ -526,9 +526,9 @@ int Game::M_004103c0(int index)
 }
 
 // OPEN: register choice: orig reuses eax for the loaded index, mine edx
-void Game::M_00410440(int index)
+int Game::M_00410440(int index)
 {
-    M_004103c0(DAT_004bde14[index * 0x16]);
+    return M_004103c0(DAT_004bde14[index * 0x16]);
 }
 
 // OPEN: orig reloads DAT_008f544c after the clearing loop (no value forwarding); mine forwards the constant

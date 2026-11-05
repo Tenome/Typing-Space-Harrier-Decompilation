@@ -1,0 +1,22 @@
+address	name	size	note
+00410ff0	FUN_00410ff0	43	missed by the first Ghidra export; added from exportcov + Ghidra
+004112d0	FUN_004112d0	98	missed by the first Ghidra export; added from exportcov + Ghidra
+00411870	FUN_00411870	22	missed by the first Ghidra export; added from exportcov + Ghidra
+00411880	FUN_00411880	10	missed by the first Ghidra export; added from exportcov + Ghidra
+004118a0	FUN_004118a0	10	missed by the first Ghidra export; added from exportcov + Ghidra
+004118c0	FUN_004118c0	10	missed by the first Ghidra export; added from exportcov + Ghidra
+004118e0	FUN_004118e0	10	missed by the first Ghidra export; added from exportcov + Ghidra
+00419e70	FUN_00419e70	16	missed by the first Ghidra export; added from exportcov + Ghidra
+0041ddf0	FUN_0041ddf0	8	missed by the first Ghidra export; added from exportcov + Ghidra
+0041de00	FUN_0041de00	31	missed by the first Ghidra export; added from exportcov + Ghidra
+0041de20	FUN_0041de20	274	missed by the first Ghidra export; added from exportcov + Ghidra
+0041e0a0	FUN_0041e0a0	47	missed by the first Ghidra export; added from exportcov + Ghidra
+0041e530	FUN_0041e530	996	missed by the first Ghidra export; added from exportcov + Ghidra
+0041eb70	FUN_0041eb70	51	missed by the first Ghidra export; added from exportcov + Ghidra
+0041ebb0	FUN_0041ebb0	5	missed by the first Ghidra export; added from exportcov + Ghidra
+0041ebc0	FUN_0041ebc0	3	missed by the first Ghidra export; added from exportcov + Ghidra
+0041ebd0	FUN_0041ebd0	5	missed by the first Ghidra export; added from exportcov + Ghidra
+0041ebe0	FUN_0041ebe0	5	missed by the first Ghidra export; added from exportcov + Ghidra
+0041ebf0	FUN_0041ebf0	14	missed by the first Ghidra export; added from exportcov + Ghidra
+0041ec00	FUN_0041ec00	19	missed by the first Ghidra export; added from exportcov + Ghidra
+0041ec20	FUN_0041ec20	6	missed by the first Ghidra export; added from exportcov + Ghidra
