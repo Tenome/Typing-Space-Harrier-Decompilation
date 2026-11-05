@@ -14,11 +14,7 @@ int FUN_00413ad0(BlitCommand *request)
     DDBLTFX fx;
     RECT srcRect;
     RECT dstRect;
-    unsigned int flags = request->flags;
-    unsigned int srcKind = flags & 0xc;
-    unsigned int dstKind = flags & 3;
-    int both = 0;
-    int scaled = flags & 0x20;
+    int both;
     int srcX, srcY, srcW, srcH;
     int dstX, dstY, dstW, dstH;
     int srcBufW, srcBufH, dstBufW, dstBufH;
@@ -31,28 +27,30 @@ int FUN_00413ad0(BlitCommand *request)
     HRESULT hr;
 
     if (DAT_00a4a824 == 0) {
-        if (srcKind == 4 || dstKind == 1)
+        if ((request->flags & 0xc) == 4 || (request->flags & 3) == 1)
             return 0;
     }
-    if (srcKind != 0 && dstKind != 0)
+    if ((request->flags & 0xc) != 0 && (request->flags & 3) != 0)
         both = 1;
+    else
+        both = 0;
 
-    if (flags & 0x10) {
+    if (request->flags & 0x10) {
         srcX = request->srcX;
         srcY = request->srcY;
         srcW = request->srcW;
         srcH = request->srcH;
-    } else if (srcKind == 0) {
+    } else if ((request->flags & 0xc) == 0) {
         srcX = 0;
         srcY = 0;
         srcW = request->srcImage->width;
         srcH = request->srcImage->height;
-    } else if (srcKind == 4) {
+    } else if ((request->flags & 0xc) == 4) {
         srcX = 0;
         srcY = 0;
         srcW = DAT_00a4a860;
         srcH = DAT_00a4b0a0;
-    } else if (srcKind == 8) {
+    } else if ((request->flags & 0xc) == 8) {
         srcX = 0;
         srcY = 0;
         srcW = DAT_00a4a6f4;
@@ -61,31 +59,31 @@ int FUN_00413ad0(BlitCommand *request)
         return 0;
     dstX = request->dstX;
     dstY = request->dstY;
-    if (scaled) {
+    if ((request->flags & 0x20)) {
         dstW = request->dstW;
         dstH = request->dstH;
     } else {
         dstW = srcW;
         dstH = srcH;
     }
-    if (srcKind == 0) {
+    if ((request->flags & 0xc) == 0) {
         srcBufW = request->srcImage->width;
         srcBufH = request->srcImage->height;
-    } else if (srcKind == 4) {
+    } else if ((request->flags & 0xc) == 4) {
         srcBufW = DAT_00a4a860;
         srcBufH = DAT_00a4b0a0;
-    } else if (srcKind == 8) {
+    } else if ((request->flags & 0xc) == 8) {
         srcBufW = DAT_00a4a6f4;
         srcBufH = DAT_00a4b0a4;
     } else
         return 0;
-    if (dstKind == 0) {
+    if ((request->flags & 3) == 0) {
         dstBufW = request->dstImage->width;
         dstBufH = request->dstImage->height;
-    } else if (dstKind == 1) {
+    } else if ((request->flags & 3) == 1) {
         dstBufW = DAT_00a4a860;
         dstBufH = DAT_00a4b0a0;
-    } else if (dstKind == 2) {
+    } else if ((request->flags & 3) == 2) {
         dstBufW = DAT_00a4a6f4;
         dstBufH = DAT_00a4b0a4;
     } else
@@ -136,7 +134,7 @@ int FUN_00413ad0(BlitCommand *request)
         newW = dstX + dstW;
         dstX = 0;
         newH = ((newW << 4) * (srcW << 4) / (dstW << 4) + 15) >> 4;
-        if ((flags & 0x40) == 0 || both == 1)
+        if ((request->flags & 0x40) == 0 || both == 1)
             srcX += srcW - newH;
         dstW = newW;
         srcW = newH;
@@ -145,7 +143,7 @@ int FUN_00413ad0(BlitCommand *request)
         newW = dstY + dstH;
         dstY = 0;
         newH = ((newW << 4) * (srcH << 4) / (dstH << 4) + 15) >> 4;
-        if ((flags & 0x80) == 0 || both == 1)
+        if ((request->flags & 0x80) == 0 || both == 1)
             srcY += srcH - newH;
         dstH = newW;
         srcH = newH;
@@ -153,7 +151,7 @@ int FUN_00413ad0(BlitCommand *request)
     if (dstX + dstW > dstBufW) {
         newW = dstBufW - dstX;
         newH = ((newW << 4) * (srcW << 4) / (dstW << 4) + 15) >> 4;
-        if ((flags & 0x40) && both == 0)
+        if ((request->flags & 0x40) && both == 0)
             srcX += srcW - newH;
         dstW = newW;
         srcW = newH;
@@ -161,7 +159,7 @@ int FUN_00413ad0(BlitCommand *request)
     if (dstY + dstH > dstBufH) {
         newW = dstBufH - dstY;
         newH = ((newW << 4) * (srcH << 4) / (dstH << 4) + 15) >> 4;
-        if ((flags & 0x80) && both == 0)
+        if ((request->flags & 0x80) && both == 0)
             srcY += srcH - newH;
         dstH = newW;
         srcH = newH;
@@ -183,12 +181,12 @@ int FUN_00413ad0(BlitCommand *request)
     if (dstY >= dstBufH || dstY + dstH <= 0)
         return 1;
 
-    if (flags & 0x400) {
+    if (request->flags & 0x400) {
         palette = 0;
-        if (srcKind == 0) {
+        if ((request->flags & 0xc) == 0) {
             if (request->srcImage->bpp == 8)
                 palette = request->srcImage->palette;
-        } else if ((srcKind == 4 && DAT_00a4a820 == 8) || (srcKind == 8 && DAT_00a4a6f0 == 8)) {
+        } else if (((request->flags & 0xc) == 4 && DAT_00a4a820 == 8) || ((request->flags & 0xc) == 8 && DAT_00a4a6f0 == 8)) {
             palette = &DAT_00a4a890;
         }
         if (palette != 0) {
@@ -212,11 +210,11 @@ int FUN_00413ad0(BlitCommand *request)
         }
     }
 
-    job.flags = flags;
+    job.flags = request->flags;
     job.keyTable = keys;
     job.blendArg = request->blendArg;
     job.blend = request->blend;
-    switch (flags & 0xf) {
+    switch (request->flags & 0xf) {
     case 0:
         if (request->srcImage->bpp == 8) {
             job.width = srcW;
@@ -227,13 +225,13 @@ int FUN_00413ad0(BlitCommand *request)
             job.dstPitch = dstBufW;
             job.src = request->srcImage->pixels + srcBufW * srcY + srcX;
             job.dst = request->dstImage->pixels + dstBufW * dstY + dstX;
-            if (scaled) {
-                if (flags & 0x200)
+            if ((request->flags & 0x20)) {
+                if (request->flags & 0x200)
                     FUN_00414f00(&job);
                 else
                     FUN_00414bd0(&job);
             } else {
-                if (flags & 0x200)
+                if (request->flags & 0x200)
                     FUN_004149d0(&job);
                 else
                     FUN_00414830(&job);
@@ -253,7 +251,7 @@ int FUN_00413ad0(BlitCommand *request)
             job.m_18 = dstH;
             job.srcPitch = srcBufW;
             job.src = request->srcImage->pixels + srcBufW * srcY + srcX;
-            surface = dstKind == 1 ? DAT_00a4a824 : DAT_00a4a864;
+            surface = (request->flags & 3) == 1 ? DAT_00a4a824 : DAT_00a4a864;
             desc.dwSize = sizeof(desc);
             while (1) {
                 hr = surface->Lock(NULL, &desc, 0, NULL);
@@ -266,13 +264,13 @@ int FUN_00413ad0(BlitCommand *request)
             }
             job.dstPitch = desc.lPitch;
             job.dst = (unsigned char *)desc.lpSurface + desc.lPitch * dstY + dstX;
-            if (scaled) {
-                if (flags & 0x200)
+            if ((request->flags & 0x20)) {
+                if (request->flags & 0x200)
                     FUN_00414f00(&job);
                 else
                     FUN_00414bd0(&job);
             } else {
-                if (flags & 0x200)
+                if (request->flags & 0x200)
                     FUN_004149d0(&job);
                 else
                     FUN_00414830(&job);
@@ -286,14 +284,14 @@ int FUN_00413ad0(BlitCommand *request)
         return 0;
     case 4:
     case 8:
-        if ((srcKind == 4 && DAT_00a4a820 == 8) || (srcKind == 8 && DAT_00a4a6f0 == 8)) {
+        if (((request->flags & 0xc) == 4 && DAT_00a4a820 == 8) || ((request->flags & 0xc) == 8 && DAT_00a4a6f0 == 8)) {
             job.width = srcW;
             job.height = srcH;
             job.dstWidth = dstW;
             job.m_18 = dstH;
             job.dstPitch = dstBufW;
             job.dst = request->dstImage->pixels + dstBufW * dstY + dstX;
-            surface = srcKind == 4 ? DAT_00a4a824 : DAT_00a4a864;
+            surface = (request->flags & 0xc) == 4 ? DAT_00a4a824 : DAT_00a4a864;
             desc.dwSize = sizeof(desc);
             while (1) {
                 hr = surface->Lock(NULL, &desc, 0, NULL);
@@ -306,13 +304,13 @@ int FUN_00413ad0(BlitCommand *request)
             }
             job.srcPitch = desc.lPitch;
             job.src = (unsigned char *)desc.lpSurface + desc.lPitch * srcY + srcX;
-            if (scaled) {
-                if (flags & 0x200)
+            if ((request->flags & 0x20)) {
+                if (request->flags & 0x200)
                     FUN_00414f00(&job);
                 else
                     FUN_00414bd0(&job);
             } else {
-                if (flags & 0x200)
+                if (request->flags & 0x200)
                     FUN_004149d0(&job);
                 else
                     FUN_00414830(&job);
@@ -328,13 +326,13 @@ int FUN_00413ad0(BlitCommand *request)
     case 6:
     case 9:
     case 10:
-        if (srcKind == 4)
+        if ((request->flags & 0xc) == 4)
             srcSurface = DAT_00a4a824;
-        else if (srcKind == 8)
+        else if ((request->flags & 0xc) == 8)
             srcSurface = DAT_00a4a864;
-        if (dstKind == 1)
+        if ((request->flags & 3) == 1)
             dstSurface = DAT_00a4a824;
-        else if (dstKind == 2)
+        else if ((request->flags & 3) == 2)
             dstSurface = DAT_00a4a864;
         if (srcSurface == 0 || dstSurface == 0)
             return 0;
@@ -342,7 +340,7 @@ int FUN_00413ad0(BlitCommand *request)
         srcRect.top = srcY;
         srcRect.right = xEnd;
         srcRect.bottom = yEnd;
-        if (flags & 0x3e0) {
+        if (request->flags & 0x3e0) {
             unsigned long bltFlags = DDBLT_WAIT;
 
             dstRect.left = dstX;
@@ -351,19 +349,19 @@ int FUN_00413ad0(BlitCommand *request)
             dstRect.bottom = dstY + dstH;
             memset(&fx, 0, sizeof(fx));
             fx.dwSize = sizeof(fx);
-            if (flags & 0x40) {
+            if (request->flags & 0x40) {
                 fx.dwDDFX |= DDBLTFX_MIRRORLEFTRIGHT;
                 bltFlags = DDBLT_WAIT | DDBLT_DDFX;
             }
-            if (flags & 0x80) {
+            if (request->flags & 0x80) {
                 fx.dwDDFX |= DDBLTFX_MIRRORUPDOWN;
                 bltFlags |= DDBLT_DDFX;
             }
-            if (flags & 0x100) {
+            if (request->flags & 0x100) {
                 fx.dwRotationAngle = request->angle;
                 bltFlags |= DDBLT_ROTATIONANGLE | DDBLT_DDFX;
             }
-            if (flags & 0x400) {
+            if (request->flags & 0x400) {
                 bltFlags |= DDBLT_KEYSRC;
                 if (request->keyLow != DAT_00a4a888 || request->keyHigh != DAT_00a4b098) {
                     unsigned long rgbLow, rgbHigh;
@@ -382,7 +380,7 @@ int FUN_00413ad0(BlitCommand *request)
         } else {
             unsigned long transFlags = 0;
 
-            if (flags & 0x400) {
+            if (request->flags & 0x400) {
                 if (request->keyLow != DAT_00a4a888 || request->keyHigh != DAT_00a4b098) {
                     unsigned long rgbLow, rgbHigh;
                     int indexLow, indexHigh;
