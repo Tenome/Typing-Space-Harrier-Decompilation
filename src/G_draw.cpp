@@ -14,7 +14,7 @@ void Game::M_0040e7a0(int x, int y, int tile, float scale)
         if (tile != 0 && height != 0) {
             Req1()->flags = 0x422;
             Req1()->src = m_8eced8[index];
-            Req1()->m_3c = m_87fbfc;
+            Req1()->m_3c = m_87fbfc[0];
             Req1()->m_38 = Req1()->m_3c;
             Req1()->srcY = 0;
             Req1()->srcX = 0;
@@ -73,7 +73,7 @@ void Game::M_0040e9f0(int x, int y, int tile, float scale)
         if (tile != 0 && height != 0) {
             Req1()->flags = 0x622;
             Req1()->src = m_8eced8[index];
-            Req1()->m_3c = m_87fbfc;
+            Req1()->m_3c = m_87fbfc[0];
             Req1()->m_38 = Req1()->m_3c;
             Req1()->srcY = 0;
             Req1()->srcX = 0;
@@ -106,7 +106,7 @@ void Game::M_0040eb70(int x, int y, int tile)
         if (tile != 0 && height != 0) {
             Req0()->flags = 0x402;
             Req0()->src = m_8eced8[index];
-            Req0()->m_3c = m_87fbfc;
+            Req0()->m_3c = m_87fbfc[0];
             Req0()->m_38 = Req0()->m_3c;
             Req0()->srcY = 0;
             Req0()->srcX = 0;
@@ -174,7 +174,7 @@ void Game::M_0040edc0(int x, int y, int dstW, int dstH, int tile)
             Req1()->dstY = y;
             Req1()->dstW = dstW;
             Req1()->dstH = dstH;
-            Req1()->m_3c = m_87fbfc;
+            Req1()->m_3c = m_87fbfc[0];
             Req1()->m_38 = Req1()->m_3c;
             Req1()->next = 0;
             Req1()->m_04 = 0;

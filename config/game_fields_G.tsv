@@ -1,2 +1,2 @@
-0x87fbfc	4	int m_87fbfc;
+0x87fbfc	0x28	int m_87fbfc[10];
 0xa7968	4	int m_a7968;

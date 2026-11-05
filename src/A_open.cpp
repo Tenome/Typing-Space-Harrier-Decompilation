@@ -65,7 +65,7 @@ void Game::M_00402310()
     M_004022e0(s->m_1c - 1, s->m_20 - 1, s->m_24 + 1, s->m_28 + 1, frame);
 
     s = m_8c4;
-    base = m_87cc28 + 0x18;
+    base = m_87cbfc[11] + 0x18;
     int tint = DAT_00430658;
     if (s->m_60 == 0 && s->m_50e0 < 0) {
         int kind = DAT_004bddf8[s->m_8].m_24;
@@ -84,8 +84,8 @@ void Game::M_00402310()
     boxW = s->m_24;
     boxH = s->m_28;
     bottom = s->m_20 + boxH;
-    tileW = m_87fc24;
-    top = s->m_20 - m_87fc64;
+    tileW = m_87fc24[0];
+    top = s->m_20 - m_87fc64[0];
     if (tileW != 0) {
         int count;
         count = boxW / tileW;
@@ -101,8 +101,8 @@ void Game::M_00402310()
         }
         edge = m_8c4->m_1c;
         top = m_8c4->m_24 + edge;
-        tileH = m_87fc68;
-        edge = edge - m_87fc28;
+        tileH = m_87fc64[1];
+        edge = edge - m_87fc24[1];
         if (tileH != 0) {
             count = boxH / tileH;
             for (i = 0; i < count; i++) {
@@ -116,16 +116,16 @@ void Game::M_00402310()
                 M_0040bea0(top, x, base + 1);
             }
             s = m_8c4;
-            edge = s->m_1c - m_87fc2c;
+            edge = s->m_1c - m_87fc24[2];
             top = s->m_24 + s->m_1c;
-            x = s->m_20 - m_87fc6c;
+            x = s->m_20 - m_87fc64[2];
             bottom = s->m_28 + s->m_20;
             M_0040bea0(edge, x, base + 2);
             M_0040bea0(top, x, base + 3);
             M_0040bea0(edge, bottom, base + 4);
             M_0040bea0(top, bottom, base + 5);
             if (m_8c0 == m_8b8) {
-                int spark = m_87cc2c + (DAT_00a46038 / 4) * 4;
+                int spark = m_87cbfc[12] + (DAT_00a46038 / 4) * 4;
                 int inset;
                 DAT_00a46038++;
                 if (DAT_00a46038 > 0xf)
@@ -135,8 +135,8 @@ void Game::M_00402310()
                 DAT_00a46034 += DAT_004e1da8;
                 if (DAT_00a46034 < 1 || DAT_00a46034 > 0xf)
                     DAT_004e1da8 = -DAT_004e1da8;
-                boxW = m_87fc2c;
-                count = m_87fc6c;
+                boxW = m_87fc24[2];
+                count = m_87fc64[2];
                 x -= inset;
                 i = edge - inset;
                 M_0040bea0(i - tileW, x - tileH, spark);
@@ -806,9 +806,9 @@ void Game::M_00402730(int x, int y, int w, int h, int set, int frame)
 
     if (frame >= 0)
         M_004022e0(x - 1, y - 1, w + 1, h + 1, frame);
-    base = m_87cc28 + set * 6;
-    tileW = m_87fc24;
-    top = y - m_87fc64;
+    base = m_87cbfc[11] + set * 6;
+    tileW = m_87fc24[0];
+    top = y - m_87fc64[0];
     bottom = y + h;
     if (tileW != 0) {
         count = w / tileW;
@@ -827,8 +827,8 @@ void Game::M_00402730(int x, int y, int w, int h, int set, int frame)
             M_0040bea0(tileW, top, base);
             M_0040bea0(tileW, bottom, base);
         }
-        leftPad = m_87fc28;
-        tileH = m_87fc68;
+        leftPad = m_87fc24[1];
+        tileH = m_87fc64[1];
         w = x + w;
         if (tileH != 0) {
             count = h / tileH;
@@ -847,8 +847,8 @@ void Game::M_00402730(int x, int y, int w, int h, int set, int frame)
                 M_0040bea0(x - leftPad, h, base + 1);
                 M_0040bea0(w, h, base + 1);
             }
-            leftPad = m_87fc2c;
-            tileH = m_87fc6c;
+            leftPad = m_87fc24[2];
+            tileH = m_87fc64[2];
             M_0040bea0(x - leftPad, y - tileH, base + 2);
             M_0040bea0(w, y - tileH, base + 3);
             M_0040bea0(x - leftPad, bottom, base + 4);
@@ -867,7 +867,7 @@ void Game::M_00403d80(int t)
     int pct, total, best, bestIdx, k, a, b, color, blink;
 
     M_0040a640();
-    M_0040bea0(0, 0, m_87cdf4);
+    M_0040bea0(0, 0, m_87cbfc[126]);
     M_0040c250(0x20, DAT_004e1e80);
     do {
         row = i % 10;
