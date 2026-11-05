@@ -14,3 +14,5 @@ Lever: VC6 `/O2` expands `memset(p, 0, small_const)` inline (intrinsic) with its
 (`lea edx,[esi+0x18]` / `add edi,0x18`); explicit zero stores or an element loop let the allocator hoist the zero
 constant (cmp reg,zero / extra push) instead. Try memset for every "zero register hoisted / pointer to the block
 computed first" wall.
+
+| 0x411db0 | R_stream.cpp | no `pos` temporaries: `stream->m_14++; if (stream->m_14 > stream->m_18) stream->m_18 = stream->m_14;` (VC6 keeps the incremented value in a register by itself and flips the compare), and the putc argument is `(unsigned char)c` (the macro then pushes `c & 0xff` to `_flsbuf` and keeps `c` for the `r != c` test) |
