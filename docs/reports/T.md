@@ -28,6 +28,7 @@ The levers suggested at the start: `while (1)` loop forms, struct-pointer-only a
 | address | state | wall |
 |---|---|---|
 | 0x416e00, 0x4170a0, 0x4171b0, 0x4172e0, 0x4173f0 | right size or within 8 B, 43-68 % | wrap-x family: x/baseH (or x/base) get swapped registers (esi/edi, ebp/edi); permuter 6 min x2 no change |
+| best fuzzy: 0x416e00 62.7 (295 vs 303 B), 0x4170a0 43.8 (265 = 265), 0x4171b0 37.8 (311 vs 301), 0x4172e0 67.9 (269 = 269, after 200 s declaration-order annealing), 0x4173f0 27.6 (327 vs 313) | declaration-order hill climbing/annealing and the permuter (2 x 6 min) do not close it; wrap-x functions read `x` through a register at entry in the original, VC6 spills it here |
 | 0x417900 | 284 = 284 B, 46 % | scaled 16.16 wrap blit, draft in T_open.cpp; original keeps `width` in memory for the first idiv |
 | 0x417a20 | not drafted | scaled keyed sibling of 0x417900 |
 
