@@ -488,3 +488,54 @@ void FUN_00416440(ReadbackJob *job)
     }
     }
 }
+
+void FUN_00416100(ClipJob *job)
+{
+    unsigned char *base = job->base;
+    int baseW = job->baseW;
+    int baseH = job->baseH;
+    int basePitch = job->basePitch;
+    unsigned char *buf = job->buf;
+    int width = job->width;
+    int height = job->height;
+    int bufPitch = job->bufPitch;
+    int x = job->x;
+    int y = job->y;
+    unsigned char *baseEnd;
+    unsigned char *srcRow;
+    unsigned char *dstRow;
+    unsigned char *src;
+    unsigned char *dst;
+    unsigned char *dstEnd;
+    unsigned char *srcEnd;
+    unsigned char *bufEnd = buf + bufPitch * height;
+
+    if (y < 0) {
+        height += y;
+        if (height < 0)
+            return;
+        buf -= y * bufPitch;
+        y = 0;
+    }
+    if (y < baseH) {
+    if (x < 0) {
+        width += x;
+        if (width < 0)
+            return;
+        buf -= x;
+        x = 0;
+    }
+    if (x < baseW) {
+        baseEnd = base + baseH * basePitch;
+        for (dstRow = buf, srcRow = base + y * basePitch; dstRow < bufEnd && srcRow < baseEnd; dstRow += bufPitch, srcRow += basePitch) {
+            dstEnd = dstRow + width;
+            srcEnd = srcRow + baseW;
+            for (dst = dstRow, src = srcRow + x; dst < dstEnd; dst++, src++) {
+                if (src >= srcEnd)
+                    break;
+                *dst = *src;
+            }
+        }
+    }
+    }
+}
