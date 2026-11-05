@@ -40,7 +40,7 @@ Bytes identical but reported DIFF only because of the function inventory: 0x4120
 | 0x4089a0 | 286 vs 290 B | inline/call set: original pushes three dead dwords (0,0,1) before the strcat run and cleans `add esp,0x24` once; nothing in the source explains them |
 | 0x4081b0 | 312 B, 5 diff lines | masked/referent-like: strength-reduced base is `&row.m_10` in the original, mine `m_0` (row pointer spelling gives `m_1c`); permuter 3 min no change |
 | 0x4119a0 | 410 vs 383 B | CFG: VC6 duplicates the shared read-tail (`m_14=0; m_10=0; m_18=size; m_1c=size; return 1`) into the file branch; the original jumps (`jmp tail`); goto form works for the write tail only |
-| 0x41a… 0x4189a0 | 42 vs 44 B | masked: original keeps `movsx` of the byte flag before `& 1`, VC6 narrows to `mov al`; tried int local, signed char, casts, `== 1`, pointer |
+| 0x4189a0 | 42 vs 44 B | masked: original keeps `movsx` of the byte flag before `& 1`, VC6 narrows to `mov al`; tried int local, signed char, casts, `== 1`, pointer |
 | 0x4043d0 | 187 vs 189 B | register/schedule: original loads m_8ac into eax before the compare and walks an absolute-address pointer (signed `jl`); int and pointer loops tried; the table is declared `int[8]` in lane A (a `{x,y}[4]` view would need a new declaration) |
 | 0x401da0 | 83% | evaluation order: original loads the value argument after the two `lea`s; local/param-slot spellings and permuter (60 s) fail |
 | 0x40fab0 | 391 B, many diffs | register/schedule: original keeps `x` in ebx up to the loop and spills it there |
