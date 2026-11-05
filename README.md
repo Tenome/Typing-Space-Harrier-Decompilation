@@ -16,7 +16,7 @@ This repository contains no game files. You need your own copy of the game.
 
 Open work: ~87 functions that differ only in register allocation or block layout, ~12 unstarted (mostly large, data-heavy
 ones), the string-literal pool, the post-link junk bytes between functions, and the final link of the whole executable.
-See `docs/DECOMP_WORKFLOW.md` and `docs/reports/`.
+See `docs/DECOMP_WORKFLOW.md` and `docs/reports/`. Time and token statistics for the work so far are in `docs/PROJECT_STATS.md` (regenerate with `python tools/usage_report.py`).
 
 ## Building
 
