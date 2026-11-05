@@ -50,3 +50,17 @@ shared `return 0` after the switch, `default: return DefaultProc(...)`) gives `t
 `neg/sbb` collapse. WM_PAINT: `if (!GetUpdateRect(...)) break;` then BeginPaint/OnPaint/EndPaint/`return 0` (the far `je` to the
 shared epilogue plus an inline epilogue). The size check counts the four byte-indexed jump tables after the code (1600 bytes
 with tables vs the 996-byte code-only inventory entry).
+
+## Round 7: key handlers, SoundMgr cleanup
+- 0x41dc20 `TypingWindow::OnKeyDown` (slot 7) and 0x41dd80 `OnSysKeyDown` (slot 21) matched in `src/X_keys.cpp`. OnKeyDown: with the
+  repeat bit (0x40000000) set only the arrow keys set the "held" flags DAT_00a46184/88/8c/90 (up, down, left, right); otherwise
+  Esc -> DAT_00a46260, Enter -> DAT_00a4625c, arrows -> DAT_00a46174/78/7c/80, F1..F4 -> DAT_00a46264[0..3]; always returns 1.
+  Lever: the repeat branch ends with `return 1` after its switch, the second switch uses `break` and a final `return 1` (this puts
+  the hoisted `mov eax,1` after the key load; a plain `return 1` in every case does not). OnSysKeyDown: Alt+F4 (VK_F4) runs
+  M_004049f0 and M_00404d80 when DAT_011216cc is set, then DestroyWindow; Alt+F2 (VK_F2) runs M_004049f0 and M_00401100; returns 1.
+- SoundMgr constructor/destructor cannot be moved into shared code with new files only, because members have to be declared in the
+  class body in `config/game_prelude_C.h`. Needed there: inside `struct SoundMgr` add `SoundMgr(); ~SoundMgr();` (and remove the
+  FUN_004118f0 method, which is the constructor body: `FUN_00411020(); m_14 = 0;`), then in C_sound.cpp define `SoundMgr::SoundMgr()`,
+  `SoundMgr::~SoundMgr()` (body in `X_sound_init.cpp`, symbols `??0SoundMgr@@QAE@XZ` 0x4118f0 and `??1SoundMgr@@QAE@XZ` 0x4112d0)
+  and the globals `SoundMgr DAT_00a460a0; NodeList DAT_00a46198;` (they generate the `$E1..$E9` stubs). Callers' `extern SoundMgr
+  DAT_00a460a0` stay valid. After that `X_sound_init.cpp` can be deleted.
