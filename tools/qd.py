@@ -9,6 +9,9 @@ def show(address, code, original, first_diff):
     orig = img.read(address, inv.get(address, len(code)))
     a = [(i.address-address, f"{i.mnemonic} {i.op_str}") for i in md.disasm(bytes(code), address)]
     b = [(i.address-address, f"{i.mnemonic} {i.op_str}") for i in md.disasm(bytes(orig), address)]
+    if os.environ.get('HEX'): print('HEX', bytes(code).hex())
+    if os.environ.get('DUMP'):
+        for o,t in a: print('M %5x %s'%(o,t))
     sm = difflib.SequenceMatcher(None, [norm(x[1]) for x in a], [norm(x[1]) for x in b], autojunk=False)
     print("  similarity %.1f%% (mine %d insns, orig %d)" % (100*sm.ratio(), len(a), len(b)))
     for tag, i1, i2, j1, j2 in sm.get_opcodes():
