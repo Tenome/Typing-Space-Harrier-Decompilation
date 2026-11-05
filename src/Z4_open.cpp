@@ -126,30 +126,30 @@ void FUN_004176f0(DistortJob *job)
     }
 }
 
-// OPEN: 0x417900 scaled 16.16 wrap blit, 291 vs 284 B. Original keeps width in the dead job slot for the first idiv and hoists x<<16 to a slot.
+// OPEN: 0x417900 scaled 16.16 wrap blit, ~290 vs 284 B, 49 % after a declaration-order climb; the original keeps width in the dead job slot for the first idiv.
 void FUN_00417900(ScaledBlitJob *job)
 {
-    int basePitch = job->basePitch;
-    unsigned char *base = job->base;
-    unsigned char *buf = job->buf;
-    int width = job->width;
-    int baseW = job->baseW;
-    int bufPitch = job->bufPitch;
-    int x = job->x;
-    int stepX = (job->m_2c << 16) / width;
-    int rows = job->rows;
     int baseH = job->baseH;
+    unsigned char *base = job->base;
+    int baseW = job->baseW;
+    int fy;
+    int width = job->width;
+    int basePitch = job->basePitch;
+    int bufPitch = job->bufPitch;
+    int wrapH = baseH << 16;
+    unsigned char *srcRow;
+    unsigned char *buf = job->buf;
+    unsigned char *dstRow;
+    int wrapW = baseW << 16;
+    int x = job->x;
+    int rows = job->rows;
+    int stepX = (job->m_2c << 16) / width;
+    unsigned char *dstEnd;
+    unsigned char *dst;
+    unsigned char *bufEnd;
+    int fx;
     int y = job->m_28;
     int stepY = (job->m_30 << 16) / rows;
-    int wrapW = baseW << 16;
-    int wrapH = baseH << 16;
-    unsigned char *bufEnd;
-    unsigned char *dstRow;
-    unsigned char *dst;
-    unsigned char *dstEnd;
-    unsigned char *srcRow;
-    int fx;
-    int fy;
 
     if (y < 0)
         y += (1 - y / baseH) * baseH;
@@ -516,3 +516,109 @@ int Game::M_00409700(int a, int b, int flag)
     return 0;
 }
 
+// OPEN: 0x417a20 keyed scaled wrap blit, ~335 vs 345 B, 50 %; stepX/stepY hoisted as locals, width stays in a param slot in the original.
+void FUN_00417a20(ScaledBlitJob *job)
+{
+    unsigned char *dst;
+    unsigned char *srcRow;
+    int baseH = job->baseH;
+    unsigned char *dstEnd;
+    int *keys = (int *)job->m_3c;
+    unsigned char *dstRow;
+    int basePitch = job->basePitch;
+    int width = job->width;
+    unsigned char *buf = job->buf;
+    unsigned char *base = job->base;
+    int fx0 = job->x << 16;
+    int baseW = job->baseW;
+    int bufPitch = job->bufPitch;
+    int y = job->m_28;
+    int wrapW = baseW << 16;
+    int wrapH = baseH << 16;
+    int rows = job->rows;
+    int stepX = (job->m_2c << 16) / width;
+    unsigned char *bufEnd;
+    int stepY = (job->m_30 << 16) / rows;
+    int fx;
+    int fy;
+
+    if (y < 0)
+        y += (1 - y / baseH) * baseH;
+    if (y >= baseH)
+        y -= y / baseH * baseH;
+    fy = y << 16;
+    bufEnd = buf + bufPitch * rows;
+    for (dstRow = buf; dstRow < bufEnd; dstRow += bufPitch) {
+        while (fy >= wrapH)
+            fy -= wrapH;
+        srcRow = base + (fy >> 16) * basePitch;
+        fx = fx0;
+        dstEnd = dstRow + width;
+        for (dst = dstRow; dst < dstEnd; dst++) {
+            while (fx >= wrapW)
+                fx -= wrapW;
+            if (keys[srcRow[fx >> 16]] == 0)
+                *dst = srcRow[fx >> 16];
+            fx += stepX;
+        }
+        fy += stepY;
+    }
+}
+
+// OPEN: 0x417d20 keyed scaled blit, ~441 B, 36 %; m2c/m30/m28 kept as plain locals and the shifted terms written inline (compiler hoists them) was closer than named origin/step locals.
+void FUN_00417d20(ScaledBlitJob *job)
+{
+    unsigned char *base = job->base;
+    unsigned char *dst;
+    unsigned char *dstEnd;
+    int fy;
+    int fx;
+    int *keys = (int *)job->m_3c;
+    int baseH = job->baseH;
+    int rows = job->rows;
+    int basePitch = job->basePitch;
+    int m30 = job->m_30;
+    int wrapH = baseH << 16;
+    int x = job->x;
+    unsigned char *srcRow;
+    unsigned char *dstRow = job->buf;
+    ScaleRowZ4 *row = (ScaleRowZ4 *)job->table;
+    int stepX;
+    int m2c = job->m_2c;
+    int bufPitch = job->bufPitch;
+    int m28 = job->m_28;
+    int baseW = job->baseW;
+    ScaleRowZ4 *end = row + rows;
+    int wrapW = baseW << 16;
+    int width = job->width;
+
+    if (x < 0)
+        x += (1 - x / baseW) * baseW;
+    if (x >= baseW)
+        x -= x / baseW * baseW;
+    for (; row < end; row++, dstRow += bufPitch) {
+        if (row->lineShift == -1 || row->divisor <= 0)
+            continue;
+        stepX = (m2c << 16) / row->divisor;
+        dstEnd = dstRow + width;
+        fy = row->lineShift * ((m30 << 16) / rows) + (m28 << 16);
+        while (fy < 0)
+            fy += wrapH;
+        while (fy >= wrapH)
+            fy -= wrapH;
+        srcRow = base + (fy >> 16) * basePitch;
+        fx = x - (row->rowShift * stepX >> 16);
+        while (fx < 0)
+            fx += baseW;
+        while (fx >= baseW)
+            fx -= baseW;
+        fx <<= 16;
+        for (dst = dstRow; dst < dstEnd; dst++) {
+            while (fx >= wrapW)
+                fx -= wrapW;
+            if (keys[srcRow[fx >> 16]] == 0)
+                *dst = srcRow[fx >> 16];
+            fx += stepX;
+        }
+    }
+}
