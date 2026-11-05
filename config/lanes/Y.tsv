@@ -1,0 +1,3 @@
+address	name	size	note
+0041dc20	FUN_0041dc20	182	TypingWindow key-down handlers (vtable slots 7 and 21); found by lane X
+0041dd80	FUN_0041dd80	110	TypingWindow key-down handlers (vtable slots 7 and 21); found by lane X

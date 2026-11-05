@@ -469,6 +469,8 @@ address	name	size	region	status
 0041d940	FUN_0041d940	11	game	todo
 0041d950	FUN_0041d950	142	game	todo
 0041d9e0	FUN_0041d9e0	556	game	todo
+0041dc20	FUN_0041dc20	182	game	todo
+0041dd80	FUN_0041dd80	110	game	todo
 0041ddf0	FUN_0041ddf0	8	game	todo
 0041de00	FUN_0041de00	31	game	todo
 0041de20	FUN_0041de20	274	game	todo
