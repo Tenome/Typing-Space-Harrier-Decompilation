@@ -31,3 +31,21 @@ MATCH-PENDING: none.
 - 0x4096b0 (9): original pushes esi only after the early return (i declared late); restructuring tried.
 - 0x410440 (2): value loaded into eax (orig) vs edx; struct-row access tried.
 - Not attempted: 0x41d0d0, 0x40c340 and everything below 0x412400 in the lane list.
+
+## Second pass (coordinator request: continue down the list)
+Matched additionally:
+| address | file | change |
+|---|---|---|
+| 0x409d10 | N_i.cpp | `int none = DAT_00430658;` declared after `i`, loop written as `for (i = 0; i < 0x40; i++)` with the early `return i` |
+| 0x4103c0 | N_j.cpp | result variable `found` declared first (own stack slot), counted `for (i = 0; i < span; i++, base++)` instead of do/while |
+
+Lesson: declare the returned/spilled result local first, and write counted loops as `for` rather than do/while after a guard.
+
+Remaining best (instruction-diff score from the permuter scale; 0 = match):
+- 0x410c20: 4 (locals `ok`, `file`, `name`, `size` in that order, `while (1)` with trailing break; only the `mov esi,table` placement differs).
+- 0x4121a0: 10 (orig keeps mask 0x80 in ecx through `and`/`mov [mask]`; mask/bits locals did not change it).
+- 0x41e190: 2 (orig emits `xor eax,eax` before `mov ecx,8`).
+- 0x40ba00: 8 (orig `test eax,eax` and zero in edx; `n >= 0` hoists the zero into edi).
+- 0x41d0d0: 30 (only `span = center - first` placement after the `steps` test differs).
+- 0x405bd0: 9, 0x406be0: 10, 0x4042a0: 14, 0x4013b0: 23 (permuter bests), 0x4076a0: 22, 0x4090a0: 24, 0x40bbe0: 25.
+- Not attempted: 0x40c340, 0x404490, 0x412400, 0x41c8a0, 0x403d80, 0x402f10 and the rest of the list below 0x405b80 (large or low fuzzy).
