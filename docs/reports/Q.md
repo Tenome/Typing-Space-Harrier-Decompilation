@@ -53,3 +53,9 @@ Reason: time. 0x40bfa0-style data (jump tables) is handled by the comparer.
 q.sh (build + full diff), qd.py (full instruction diff using tools/compare_obj.py), qperm.py (declaration-order permuter), rd.py (read data
 from tsh.exe), overrides.txt (private declaration patches applied to include/game.h for requests 1 and 2).
 Build note: use `sh build/Q/q.sh Q_x.cpp`; the official `tools/build_all.py --file` works for Q_b5c0, Q_stage, Q_progress, Q_script.
+
+## Round 3b (after merge of master)
+- 0x40bfa0: tried `switch (*text)` with the character tests on `*text` (57.7%, worse than the 63.3% `c` form) and, earlier, do/while with an
+  entry test and an unsigned-char test; the loop-test reload is still not reproduced. Left in Q_open.cpp.
+- 0x409700 read (1435 B): many 6-argument M_0040b0e0 calls and 1/32 fixed-point scaling; needs callee signatures first. Not drafted.
+- Remaining unattempted: 4189d0, 409e00, 40a900, 40f3a0, 40d400, 4193c0, 413ad0, 415320, and the blit family.
