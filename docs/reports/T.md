@@ -41,3 +41,11 @@ Total in `src\T_blit.cpp`: 16 functions.
 | 0x413ad0, 0x415320 | not attempted | dispatchers (3267 / 3552 B) |
 
 Not source (ignored): 0x40c690, 0x41eea0, 0x41eea6 thunks; 0x41eeb0 `_alloca_probe` is ORIGINAL-ASM.
+
+## Round 6 (scaled blits; no new matches)
+Applied the per-row `dstEnd` local and the for-init cursor pair to the 16.16 wrap blits 0x417900 / 0x417a20 (keyed): sizes 284 = 284 B
+and 336 vs 345 B, but fuzzy only 46-60 % and 54 %; declaration-order annealing (5 min) moves them by a few points only. The original keeps `width`
+in its stack slot for the first `idiv` (memory operand) and the pixel byte of 0x417a20 in a stack temp; the register assignment of the entry block
+differs from every spelling tried. 0x414830 (390 vs 416 B) and the Bresenham blits 0x414bd0 / 0x414f00 / 0x4149d0 (horizontal-step error terms,
+four mirrored variants each, frame 0x28) were read but not matched; 0x417b80, 0x417d20, 0x4176f0, 0x417530 (12-byte distortion records) and the
+dispatchers 0x413ad0 / 0x415320 were not drafted.
