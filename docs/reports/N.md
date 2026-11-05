@@ -63,3 +63,12 @@ Lessons: model the loop semantics (separate counter, result assigned from counte
 
 Remaining best: 0x410c20 4, 0x4121a0 10, 0x4121f0 9 (needs `unsigned bit`), 0x40ba00 8, 0x406be0 about 10 (register naming only: count lands in edx, orig ecx; idx-- before p--, `unsigned value`), 0x4090a0 about 30 (ebx/edi swap, mode spilled), 0x40c340 28 with ones[12] (frame is 0x150 in the original; late `push edi`), 0x41d0d0 30, 0x40bc60 11, 0x4013b0 23.
 Not attempted or not reachable in the time: 0x404490, 0x412400, 0x41c8a0, 0x403d80, 0x402f10 and the D/H/I lanes' large functions (blit, MCI, DirectDraw): their parked sources are still far (fuzzy below 50).
+
+## Fourth pass (large functions and near-misses; no new matches)
+- 0x404490: 53 (parked 63) with the `goto bump/restart` labels replaced by inline copies; the original lays out case 1's tail separately and falls case 3 into the restart block, mine still places the restart/bump block differently (1064 vs 1050 bytes). Not matched.
+- 0x412400: 7 (parked 14). Writing `if (DAT_00a4b0a8 == 1) return 1; { ... } ` with literal 1 instead of an `ok` variable gets 7; remaining difference is the original keeping eax=1 as a live value (`cmp ecx,eax`, `mov eax,1; mov [DAT],eax` at the end). Making `ok` non-constant (assigned 0 on the failure paths) did not change it.
+- 0x41c8a0: 36 and 0x403d80: 67 (permuter 4 min); 0x402f10 not reached.
+- 0x410c20: 4 (best variant: nested `if (*name != 0) { file = table; if (size != 0) while (1) {...} }`; a do-while bottom test makes VC6 peel the first iteration).
+- 0x4121f0: 9; `top *= 2` after the loop made it worse (22).
+- 0x406be0: 11 after trying all 240 local-declaration orders with int/unsigned value.
+- 0x410440: 2, unchanged.
