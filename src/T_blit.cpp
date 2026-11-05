@@ -388,3 +388,103 @@ void FUN_00416ce0(ReadbackJob *job)
         }
     }
 }
+
+void FUN_00416350(ReadbackJob *job)
+{
+    unsigned char *base = job->base;
+    int baseW = job->baseW;
+    int baseH = job->baseH;
+    int basePitch = job->basePitch;
+    unsigned char *buf = job->buf;
+    int width = job->width;
+    int height = job->height;
+    int bufPitch = job->bufPitch;
+    int x = job->x;
+    int y = job->y;
+    unsigned char *baseEnd;
+    unsigned char *srcRow;
+    unsigned char *dstRow;
+    unsigned char *row;
+    unsigned char *src;
+    unsigned char *dst;
+    unsigned char *dstEnd;
+    unsigned char *srcEnd;
+    unsigned char *bufEnd = buf + bufPitch * height;
+
+    if (x < 0) {
+        width += x;
+        if (width < 0)
+            return;
+        buf -= x;
+        x = 0;
+    }
+    if (x < baseW) {
+    baseEnd = base + baseH * basePitch;
+    for (dstRow = buf, srcRow = base + y * basePitch; dstRow < bufEnd; dstRow += bufPitch, srcRow += basePitch) {
+        if (srcRow < base)
+            row = base;
+        else if (srcRow >= baseEnd)
+            row = baseEnd - basePitch;
+        else
+            row = srcRow;
+        dstEnd = dstRow + width;
+        srcEnd = row + baseW;
+        for (dst = dstRow, src = row + x; dst < dstEnd; dst++, src++) {
+            if (src >= srcEnd)
+                break;
+            *dst = *src;
+        }
+    }
+    }
+}
+
+void FUN_00416440(ReadbackJob *job)
+{
+    unsigned char *base = job->base;
+    int baseW = job->baseW;
+    int baseH = job->baseH;
+    int basePitch = job->basePitch;
+    unsigned char *buf = job->buf;
+    int width = job->width;
+    int height = job->height;
+    int bufPitch = job->bufPitch;
+    int x = job->x;
+    int y = job->y;
+    int *keys = job->keys;
+    unsigned char *baseEnd;
+    unsigned char *srcRow;
+    unsigned char *dstRow;
+    unsigned char *row;
+    unsigned char *src;
+    unsigned char *dst;
+    unsigned char *dstEnd;
+    unsigned char *srcEnd;
+    unsigned char *bufEnd = buf + bufPitch * height;
+
+    if (x < 0) {
+        width += x;
+        if (width < 0)
+            return;
+        buf -= x;
+        x = 0;
+    }
+    if (x < baseW) {
+    baseEnd = base + baseH * basePitch;
+    for (dstRow = buf, srcRow = base + y * basePitch; dstRow < bufEnd; dstRow += bufPitch, srcRow += basePitch) {
+        if (srcRow < base)
+            row = base;
+        else if (srcRow >= baseEnd)
+            row = baseEnd - basePitch;
+        else
+            row = srcRow;
+        dstEnd = dstRow + width;
+        srcEnd = row + baseW;
+        for (dst = dstRow, src = row + x; dst < dstEnd; dst++, src++) {
+            if (src >= srcEnd)
+                break;
+            if (keys[*src] == 0)
+                *dst = *src;
+        }
+    }
+    }
+}
