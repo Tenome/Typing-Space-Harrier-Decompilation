@@ -33,7 +33,7 @@ void M_00404a90();
 int M_00404d80();
 void M_0040f330();
 int M_004103c0(int index);
-void M_00410440(int index);
+int M_00410440(int index);
 void M_004104e0(int id, int mode);
 void M_00410580(int mode, int all);
 void M_00410280(int ch, int hit);
