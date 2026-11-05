@@ -11,3 +11,6 @@ extern char  *DAT_004f0658;
 extern char  *DAT_004efa38;
 extern char   DAT_009aa29c[];
 int *FUN_004129a0(char *bitmap, char *dest, char **limit);
+extern int DAT_004f0534[7];
+extern int DAT_004efa1c[7];
+extern int DAT_00a46048;
