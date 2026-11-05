@@ -5,13 +5,13 @@ void Game::M_00406910(int n, int arg)
 {
     int i = 0;
     int k;
+    Obj_009a629c *o;
     int count;
 
     if (n < 0 || DAT_009a5e98.m_0 < n)
         n = DAT_009a5e98.m_0;
     count = DAT_009a5e98.m_0;
-    for (k = 0; k < 0x100; k++) {
-        Obj_009a629c *o = &DAT_009a629c[k];
+    for (k = 0, o = DAT_009a629c; k < 0x100; k++, o++) {
         DAT_00a3d6ec = o;
         if (o->m_0 != 0 && o->m_8 > 0) {
             o->m_8 -= n;
