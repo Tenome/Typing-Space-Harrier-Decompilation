@@ -42,3 +42,13 @@ Others in the lane list were not reached in this round (4052e0, 404490, 402f10, 
 - Updating a member directly (`s->a++; if (s->a > s->b) s->b = s->a;`) lets VC6 keep the value in a register itself; a `pos` temporary changed the register plan and the compare direction.
 - `putc((unsigned char)c, fp)`: the macro then pushes the masked value to `_flsbuf` and keeps `c` for later compares.
 - VC6 sometimes pushes a callee-saved register lazily after an early return (4096b0 original) or inside a block (40c340 original); mine pushes at the top. Cause not found.
+
+## Second session (after merging master)
+Matched (src/R_clear2.cpp):
+| address | change |
+|---|---|
+| 0x409ce0 | the five timer stores became `memset(DAT_004efa18, 0, 0x14)` |
+| 0x410760 | the zero-word loop became `memset(DAT_008f544c, 0, sizeof(*DAT_008f544c))` (through the global pointer, not `&DAT_0099d6c0`, so the later field stores reload the pointer as the original does) |
+
+Memset retried without a match: 0x41c8a0 (36 to 25 with memset on the 3-int clear, but the original keeps a hoisted zero in edi, so the explicit stores stay; remaining wall is the register rotation of the tail argument loads), 0x412ec0 (58 to 48; the original clears the palette with a pointer loop, not memset), 0x411340 (variable-size memset is a call, worse), 0x409e00 (no change; the original indexes `short DAT[c*2]` through `lea ecx,[eax+eax]`).
+Other tries without result: 0x4013b0 (original pushes esi only after the first test: the lazy callee-saved push seen in 4096b0 and 40c340), 0x4012a0, 0x40b140 (index form 73), permuter 10 min on 4012a0, 405c50, 403d80, 41d460, 41d0d0 (best 67, 126, 67, 55, 30).
