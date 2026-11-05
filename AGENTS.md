@@ -57,3 +57,12 @@ Model data first (typed globals, record structs, enums), then transcribe. `sub r
 statements. A hoisted zero register usually means a differently scoped variable. `while (1) { ...; if (c) break; ... }`
 compiles differently from `do {} while`, `for` and `while (c)`. `BOOL f = TRUE; if (x == 0) f = FALSE;` yields
 `mov eax,1; jne; xor eax,eax`. Check loop bounds against relocation addends. Park a function after a handful of attempts.
+
+## Working in parallel (git worktrees)
+Several people or agents can work at once, each in a worktree of their own: `git worktree add build/wt/<L> -b lane-<L>` (build/ is
+git-ignored), copy `orig/tsh.exe` into the worktree, then build there with `python tools/build_all.py --file <L>_foo.cpp`.
+Lane lists are in `config/lanes/<L>.tsv`. To avoid merge conflicts a lane only **adds new files**: `src/<L>_*.cpp`,
+`config/game_fields_<L>.tsv`, `config/slot_fields_<L>.tsv`, `config/game_methods_<L>.txt`, `config/game_prelude_<L>.h`,
+`config/symbols_<L>.tsv` and `docs/reports/<L>.md`. A function fixed in a new file wins over its parked copy in an older
+`*_open.cpp` (the report keeps the best result per address); delete the parked copy later in a separate cleanup commit.
+Commit on the lane branch as you go; do not push. Keep scratch scripts under `build/`.
