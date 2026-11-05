@@ -1,0 +1,408 @@
+#include <string.h>
+#include <windows.h>
+#include <ddraw.h>
+#include "game.h"
+
+// OPEN: 00413ad0 (BlitRequest clip-and-dispatch, 3267 B): complete transcription from the disassembly (clip of source and
+// destination rectangles with 4-bit fixed-point proportional scaling, colour-key table, switch over the surface kinds);
+// bytes do not match. See docs/reports/V.md for the size reached.
+int FUN_00413ad0(BlitCommand *request)
+{
+    int keys[256];
+    BlitJob job;
+    DDSURFACEDESC desc;
+    DDBLTFX fx;
+    RECT srcRect;
+    RECT dstRect;
+    unsigned int flags = request->flags;
+    unsigned int srcKind = flags & 0xc;
+    unsigned int dstKind = flags & 3;
+    int both = 0;
+    int scaled = flags & 0x20;
+    int srcX, srcY, srcW, srcH;
+    int dstX, dstY, dstW, dstH;
+    int srcBufW, srcBufH, dstBufW, dstBufH;
+    int newW, newH;
+    int xEnd, yEnd;
+    IDirectDrawSurface *surface;
+    IDirectDrawSurface *srcSurface;
+    IDirectDrawSurface *dstSurface;
+    PaletteTable *palette;
+    HRESULT hr;
+
+    if (DAT_00a4a824 == 0) {
+        if (srcKind == 4 || dstKind == 1)
+            return 0;
+    }
+    if (srcKind != 0 && dstKind != 0)
+        both = 1;
+
+    if (flags & 0x10) {
+        srcX = request->srcX;
+        srcY = request->srcY;
+        srcW = request->srcW;
+        srcH = request->srcH;
+    } else if (srcKind == 0) {
+        srcX = 0;
+        srcY = 0;
+        srcW = request->srcImage->width;
+        srcH = request->srcImage->height;
+    } else if (srcKind == 4) {
+        srcX = 0;
+        srcY = 0;
+        srcW = DAT_00a4a860;
+        srcH = DAT_00a4b0a0;
+    } else if (srcKind == 8) {
+        srcX = 0;
+        srcY = 0;
+        srcW = DAT_00a4a6f4;
+        srcH = DAT_00a4b0a4;
+    } else
+        return 0;
+    dstX = request->dstX;
+    dstY = request->dstY;
+    if (scaled) {
+        dstW = request->dstW;
+        dstH = request->dstH;
+    } else {
+        dstW = srcW;
+        dstH = srcH;
+    }
+    if (srcKind == 0) {
+        srcBufW = request->srcImage->width;
+        srcBufH = request->srcImage->height;
+    } else if (srcKind == 4) {
+        srcBufW = DAT_00a4a860;
+        srcBufH = DAT_00a4b0a0;
+    } else if (srcKind == 8) {
+        srcBufW = DAT_00a4a6f4;
+        srcBufH = DAT_00a4b0a4;
+    } else
+        return 0;
+    if (dstKind == 0) {
+        dstBufW = request->dstImage->width;
+        dstBufH = request->dstImage->height;
+    } else if (dstKind == 1) {
+        dstBufW = DAT_00a4a860;
+        dstBufH = DAT_00a4b0a0;
+    } else if (dstKind == 2) {
+        dstBufW = DAT_00a4a6f4;
+        dstBufH = DAT_00a4b0a4;
+    } else
+        return 0;
+
+    if (srcW <= 0 || srcH <= 0 || dstW <= 0 || dstH <= 0)
+        return 1;
+    if (srcX >= srcBufW)
+        return 1;
+    xEnd = srcX + srcW;
+    if (xEnd <= 0)
+        return 1;
+    if (srcY >= srcBufH)
+        return 1;
+    yEnd = srcY + srcH;
+    if (yEnd <= 0)
+        return 1;
+    if (dstX >= dstBufW || dstX + dstW <= 0)
+        return 1;
+    if (dstY >= dstBufH || dstY + dstH <= 0)
+        return 1;
+
+    if (srcX < 0) {
+        newW = ((xEnd << 4) * (dstW << 4) / (srcW << 4) + 15) >> 4;
+        dstX += dstW - newW;
+        dstW = newW;
+        srcX = 0;
+        srcW = xEnd;
+    }
+    if (srcY < 0) {
+        newH = ((yEnd << 4) * (dstH << 4) / (srcH << 4) + 15) >> 4;
+        dstY += dstH - newH;
+        dstH = newH;
+        srcY = 0;
+        srcH = yEnd;
+    }
+    if (srcX + srcW > srcBufW) {
+        newW = srcBufW - srcX;
+        dstW = ((newW << 4) * (dstW << 4) / (srcW << 4) + 15) >> 4;
+        srcW = newW;
+    }
+    if (srcY + srcH > srcBufH) {
+        newH = srcBufH - srcY;
+        dstH = ((newH << 4) * (dstH << 4) / (srcH << 4) + 15) >> 4;
+        srcH = newH;
+    }
+    if (dstX < 0) {
+        newW = dstX + dstW;
+        dstX = 0;
+        newH = ((newW << 4) * (srcW << 4) / (dstW << 4) + 15) >> 4;
+        if ((flags & 0x40) == 0 || both == 1)
+            srcX += srcW - newH;
+        dstW = newW;
+        srcW = newH;
+    }
+    if (dstY < 0) {
+        newW = dstY + dstH;
+        dstY = 0;
+        newH = ((newW << 4) * (srcH << 4) / (dstH << 4) + 15) >> 4;
+        if ((flags & 0x80) == 0 || both == 1)
+            srcY += srcH - newH;
+        dstH = newW;
+        srcH = newH;
+    }
+    if (dstX + dstW > dstBufW) {
+        newW = dstBufW - dstX;
+        newH = ((newW << 4) * (srcW << 4) / (dstW << 4) + 15) >> 4;
+        if ((flags & 0x40) && both == 0)
+            srcX += srcW - newH;
+        dstW = newW;
+        srcW = newH;
+    }
+    if (dstY + dstH > dstBufH) {
+        newW = dstBufH - dstY;
+        newH = ((newW << 4) * (srcH << 4) / (dstH << 4) + 15) >> 4;
+        if ((flags & 0x80) && both == 0)
+            srcY += srcH - newH;
+        dstH = newW;
+        srcH = newH;
+    }
+    if (srcW <= 0 || srcH <= 0 || dstW <= 0 || dstH <= 0)
+        return 1;
+    if (srcX >= srcBufW)
+        return 1;
+    xEnd = srcX + srcW;
+    if (xEnd <= 0)
+        return 1;
+    if (srcY >= srcBufH)
+        return 1;
+    yEnd = srcY + srcH;
+    if (yEnd <= 0)
+        return 1;
+    if (dstX >= dstBufW || dstX + dstW <= 0)
+        return 1;
+    if (dstY >= dstBufH || dstY + dstH <= 0)
+        return 1;
+
+    if (flags & 0x400) {
+        palette = 0;
+        if (srcKind == 0) {
+            if (request->srcImage->bpp == 8)
+                palette = request->srcImage->palette;
+        } else if ((srcKind == 4 && DAT_00a4a820 == 8) || (srcKind == 8 && DAT_00a4a6f0 == 8)) {
+            palette = &DAT_00a4a890;
+        }
+        if (palette != 0) {
+            unsigned char lowR = (unsigned char)request->keyLow;
+            unsigned char lowG = (unsigned char)(request->keyLow >> 8);
+            unsigned char lowB = (unsigned char)(request->keyLow >> 16);
+            unsigned char highR = (unsigned char)request->keyHigh;
+            unsigned char highG = (unsigned char)(request->keyHigh >> 8);
+            unsigned char highB = (unsigned char)(request->keyHigh >> 16);
+            int i;
+
+            for (i = 0; i < 256; i++) {
+                if (palette->used[i] == 1
+                    && palette->entry[i].r >= lowR && palette->entry[i].r <= highR
+                    && palette->entry[i].g >= lowG && palette->entry[i].g <= highG
+                    && palette->entry[i].b >= lowB && palette->entry[i].b <= highB)
+                    keys[i] = 1;
+                else
+                    keys[i] = 0;
+            }
+        }
+    }
+
+    job.flags = flags;
+    job.keyTable = keys;
+    job.blendArg = request->blendArg;
+    job.blend = request->blend;
+    switch (flags & 0xf) {
+    case 0:
+        if (request->srcImage->bpp == 8) {
+            job.width = srcW;
+            job.height = srcH;
+            job.dstWidth = dstW;
+            job.m_18 = dstH;
+            job.srcPitch = srcBufW;
+            job.dstPitch = dstBufW;
+            job.src = request->srcImage->pixels + srcBufW * srcY + srcX;
+            job.dst = request->dstImage->pixels + dstBufW * dstY + dstX;
+            if (scaled) {
+                if (flags & 0x200)
+                    FUN_00414f00(&job);
+                else
+                    FUN_00414bd0(&job);
+            } else {
+                if (flags & 0x200)
+                    FUN_004149d0(&job);
+                else
+                    FUN_00414830(&job);
+            }
+            FUN_004147c0(request->dstImage->palette, request->srcImage->palette);
+            return 1;
+        }
+        if (request->srcImage->bpp == 0x10 || request->srcImage->bpp == 0x18 || request->srcImage->bpp == 0x20)
+            return 1;
+        return 0;
+    case 1:
+    case 2:
+        if (request->srcImage->bpp == 8) {
+            job.width = srcW;
+            job.height = srcH;
+            job.dstWidth = dstW;
+            job.m_18 = dstH;
+            job.srcPitch = srcBufW;
+            job.src = request->srcImage->pixels + srcBufW * srcY + srcX;
+            surface = dstKind == 1 ? DAT_00a4a824 : DAT_00a4a864;
+            desc.dwSize = sizeof(desc);
+            while (1) {
+                hr = surface->Lock(NULL, &desc, 0, NULL);
+                if (hr == DD_OK)
+                    break;
+                if (hr == DDERR_SURFACELOST)
+                    return 0;
+                if (hr != DDERR_WASSTILLDRAWING)
+                    return 0;
+            }
+            job.dstPitch = desc.lPitch;
+            job.dst = (unsigned char *)desc.lpSurface + desc.lPitch * dstY + dstX;
+            if (scaled) {
+                if (flags & 0x200)
+                    FUN_00414f00(&job);
+                else
+                    FUN_00414bd0(&job);
+            } else {
+                if (flags & 0x200)
+                    FUN_004149d0(&job);
+                else
+                    FUN_00414830(&job);
+            }
+            surface->Unlock(NULL);
+            FUN_004147c0(&DAT_00a4a890, request->srcImage->palette);
+            return 1;
+        }
+        if (request->srcImage->bpp == 0x10 || request->srcImage->bpp == 0x18 || request->srcImage->bpp == 0x20)
+            return 1;
+        return 0;
+    case 4:
+    case 8:
+        if ((srcKind == 4 && DAT_00a4a820 == 8) || (srcKind == 8 && DAT_00a4a6f0 == 8)) {
+            job.width = srcW;
+            job.height = srcH;
+            job.dstWidth = dstW;
+            job.m_18 = dstH;
+            job.dstPitch = dstBufW;
+            job.dst = request->dstImage->pixels + dstBufW * dstY + dstX;
+            surface = srcKind == 4 ? DAT_00a4a824 : DAT_00a4a864;
+            desc.dwSize = sizeof(desc);
+            while (1) {
+                hr = surface->Lock(NULL, &desc, 0, NULL);
+                if (hr == DD_OK)
+                    break;
+                if (hr == DDERR_SURFACELOST)
+                    return 0;
+                if (hr != DDERR_WASSTILLDRAWING)
+                    return 0;
+            }
+            job.srcPitch = desc.lPitch;
+            job.src = (unsigned char *)desc.lpSurface + desc.lPitch * srcY + srcX;
+            if (scaled) {
+                if (flags & 0x200)
+                    FUN_00414f00(&job);
+                else
+                    FUN_00414bd0(&job);
+            } else {
+                if (flags & 0x200)
+                    FUN_004149d0(&job);
+                else
+                    FUN_00414830(&job);
+            }
+            surface->Unlock(NULL);
+            FUN_004147c0(request->dstImage->palette, &DAT_00a4a890);
+            return 1;
+        }
+        if (request->srcImage->bpp == 0x10 || request->srcImage->bpp == 0x18 || request->srcImage->bpp == 0x20)
+            return 1;
+        return 0;
+    case 5:
+    case 6:
+    case 9:
+    case 10:
+        if (srcKind == 4)
+            srcSurface = DAT_00a4a824;
+        else if (srcKind == 8)
+            srcSurface = DAT_00a4a864;
+        if (dstKind == 1)
+            dstSurface = DAT_00a4a824;
+        else if (dstKind == 2)
+            dstSurface = DAT_00a4a864;
+        if (srcSurface == 0 || dstSurface == 0)
+            return 0;
+        srcRect.left = srcX;
+        srcRect.top = srcY;
+        srcRect.right = xEnd;
+        srcRect.bottom = yEnd;
+        if (flags & 0x3e0) {
+            unsigned long bltFlags = DDBLT_WAIT;
+
+            dstRect.left = dstX;
+            dstRect.top = dstY;
+            dstRect.right = dstX + dstW;
+            dstRect.bottom = dstY + dstH;
+            memset(&fx, 0, sizeof(fx));
+            fx.dwSize = sizeof(fx);
+            if (flags & 0x40) {
+                fx.dwDDFX |= DDBLTFX_MIRRORLEFTRIGHT;
+                bltFlags = DDBLT_WAIT | DDBLT_DDFX;
+            }
+            if (flags & 0x80) {
+                fx.dwDDFX |= DDBLTFX_MIRRORUPDOWN;
+                bltFlags |= DDBLT_DDFX;
+            }
+            if (flags & 0x100) {
+                fx.dwRotationAngle = request->angle;
+                bltFlags |= DDBLT_ROTATIONANGLE | DDBLT_DDFX;
+            }
+            if (flags & 0x400) {
+                bltFlags |= DDBLT_KEYSRC;
+                if (request->keyLow != DAT_00a4a888 || request->keyHigh != DAT_00a4b098) {
+                    unsigned long rgbLow, rgbHigh;
+                    int indexLow, indexHigh;
+
+                    DAT_00a4a888 = request->keyLow;
+                    DAT_00a4b098 = request->keyHigh;
+                    FUN_00412fe0(request->keyLow, request->keyHigh, 1, &rgbLow, &rgbHigh, &indexLow, &indexHigh);
+                    DAT_00a4a880 = indexLow;
+                    DAT_00a4a884 = indexHigh;
+                    if (DAT_00a4a824->SetColorKey(DDCKEY_SRCBLT, (DDCOLORKEY *)&DAT_00a4a880) != 0)
+                        return 0;
+                }
+            }
+            hr = dstSurface->Blt(&dstRect, srcSurface, &srcRect, bltFlags, &fx);
+        } else {
+            unsigned long transFlags = 0;
+
+            if (flags & 0x400) {
+                if (request->keyLow != DAT_00a4a888 || request->keyHigh != DAT_00a4b098) {
+                    unsigned long rgbLow, rgbHigh;
+                    int indexLow, indexHigh;
+
+                    DAT_00a4a888 = request->keyLow;
+                    DAT_00a4b098 = request->keyHigh;
+                    FUN_00412fe0(request->keyLow, request->keyHigh, 1, &rgbLow, &rgbHigh, &indexLow, &indexHigh);
+                    DAT_00a4a880 = indexLow;
+                    DAT_00a4a884 = indexHigh;
+                    if (DAT_00a4a824->SetColorKey(DDCKEY_SRCBLT, (DDCOLORKEY *)&DAT_00a4a880) != 0)
+                        return 0;
+                }
+                transFlags = DDBLTFAST_SRCCOLORKEY | DDBLTFAST_WAIT;
+            }
+            hr = dstSurface->BltFast(dstX, dstY, srcSurface, &srcRect, transFlags);
+        }
+        if (hr != 0)
+            return 0;
+        return 1;
+    default:
+        return 0;
+    }
+}
