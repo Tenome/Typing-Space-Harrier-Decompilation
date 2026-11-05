@@ -5,16 +5,17 @@ void Game::M_004078f0()
     int seen[7];
     int cur;
     int k;
+    int sprite;
 
     DAT_004efbd4 = 0;
     for (k = 0; k < 7; k++)
         DAT_004f0534[k] = 0;
     for (k = 0; k < 7; k++)
         DAT_004efa1c[k] = 0;
-    for (k = 0; k < 7; k++)
-        seen[k] = 0;
     DAT_008f0ff4 = 0;
     DAT_004efa14 = 0;
+    for (k = 0; k < 7; k++)
+        seen[k] = 0;
     for (;;) {
         cur = DAT_00430658;
         M_00407c90(1);
@@ -115,7 +116,8 @@ void Game::M_004078f0()
             }
             DAT_004efa1c[3]++;
             M_00407c90(4);
-            M_00407e40(M_0040bf80(DAT_004f065c[0], DAT_004f065c[1]), 0, DAT_004f065c[2], DAT_004f065c[3]);
+            sprite = M_0040bf80(DAT_004f065c[0], DAT_004f065c[1]);
+            M_00407e40(sprite, 0, DAT_004f065c[2], DAT_004f065c[3]);
             continue;
         }
         if (cur >= 0) {
