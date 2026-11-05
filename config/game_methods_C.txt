@@ -13,7 +13,7 @@ void M_0040e2d0();
 int M_0040e340(int n);
 int M_0040e360(int n);
 void M_0040f0a0();
-void M_0040e380();
+int M_0040e380();
 void M_0040f860();
 void M_0040fa80();
 void M_0040fc40();

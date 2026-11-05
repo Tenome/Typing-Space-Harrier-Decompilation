@@ -237,6 +237,14 @@ def main():
             text.append("// OPEN: " + reason)
             text.append(render(s))
         outputs["K_open.cpp"] = "\n".join(text)
+    scalar_decls = set()
+    for prelude in glob.glob(os.path.join(ROOT, "config", "game_prelude_*.h")):
+        scalar_decls |= set(re.findall(r"extern\s+char\s*\*\s*(DAT_[0-9a-fA-F]{8})\s*;", open(prelude, encoding="utf-8", errors="replace").read()))
+    for fname in list(outputs):
+        # a one-element table of string pointers that code declares as a plain `char *` is a single pointer variable
+        outputs[fname] = re.sub(r'char \*(DAT_[0-9a-fA-F]{8})\[\] = \{\s*("(?:[^"\\]|\\.)*")\s*\};',
+                                lambda m: 'char *%s = %s;' % (m.group(1), m.group(2)) if m.group(1) in scalar_decls else m.group(0),
+                                outputs[fname])
     for fname, text in outputs.items():
         path = os.path.join(ROOT, "src", fname)
         with open(path, "w", encoding="utf-8", newline="\r\n") as fh:
