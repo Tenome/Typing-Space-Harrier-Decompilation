@@ -1,8 +1,8 @@
 # Lane X report (21 functions the first Ghidra export missed)
 
-Matched: 20 of 21 (all bytes and relocations identical, no tricks). Open: 0x41e530 (window procedure).
+Matched: 21 of 21 (all bytes and relocations identical, no tricks).
 Files: `X_window.cpp` + `X_window.h` (window classes, virtual handlers), `X_sound_init.cpp`, `X_list.cpp`, `X_misc.cpp`,
-`X_open.cpp` (window procedure), `config/symbols_X.tsv`.
+`X_window_proc.cpp` (window procedure), `config/symbols_X.tsv`.
 
 ## Matched
 - Virtual handlers of `EzWindow` (slot = vtable index of the TypingWindow vtable at 0x4271f0, message in brackets):
@@ -39,14 +39,14 @@ WM_KEYUP, WM_CHAR, WM_SYSKEYDOWN, WM_SYSKEYUP, WM_SYSCHAR, WM_COMMAND, WM_SYSCOM
 to DefWindowProc), WM_DROPFILES. Handlers returning non-zero return 0, otherwise DefWindowProc (OnPower/OnSysCommand: the
 result unless it is -1). Slot 20 (0x41d9e0) is the idle step called from the message loop 0x41e480, not from the procedure.
 
-## Open: 0x41e530 (`EzWindow::WindowProc`, `src/X_open.cpp`)
-Case set, case order and the four byte-indexed jump tables are reproduced (same switch tree: `cmp 0x105; ja; je`, 0x1c, ...), but
-1523 bytes vs 996. The original keeps `wParam`/`lParam` in memory and loads them per case into ebx/ebp as temporaries
-(`mov ebx,[l]; mov ebp,[w]`), `msg` in edi, `this` in esi, and cross-jumps the DefWindowProc tails (`jmp 0x41e8fc` after pushing
-l/w, `0x41e8fd` after pushing a known message constant). Mine enregisters both parameters for the whole function and does not
-share tails. Class: register/schedule (parameter enregistration), plus tail merging that depends on it. Tried: `break` to one
-shared `return DefWindowProc` vs per-case returns, `if (!x) return -1` vs `if (x) return 0; return -1` (the original does not
-collapse to `neg/sbb`: it is `test; jne ret0; or eax,-1`), /GX on the file (no effect). Not tried: per-case inline helpers that
-copy the parameters, a message-cracker macro layer. `X_window.cpp` needs no /GX; the original probably sits in E_app.cpp's
-translation unit (constructors inline in WinMain), here two out-of-line constructors only make the compiler emit the vtable and the
-inline virtual bodies.
+## 0x41e530 `EzWindow::WindowProc` (`src/X_window_proc.cpp`)
+Matched. What made the difference: the default-processing call is an inline member, `LRESULT DefaultProc(UINT msg, WPARAM w,
+LPARAM l) { return DefWindowProc(m_160, msg, w, l); }`. With a direct `DefWindowProc(m_160, msg, wParam, lParam)` at every site
+VC6 enregisters wParam/lParam for the whole function (1523 bytes, no tail sharing); with the inline helper the parameters stay in
+memory, are cached per case in ebx/ebp, and the identical `push msg; push hwnd; call` tails are cross-jumped, exactly as in the
+original. Second lever: the shape of the handler tests. `if (!OnX(...)) return DefaultProc(...); break;` (a `break` to one
+shared `return 0` after the switch, `default: return DefaultProc(...)`) gives `test; jne shared_ret0`, whereas
+`if (OnX(...)) return 0; return DefaultProc(...)` gives an inline `xor eax,eax` epilogue and, for the -1/0 handlers, the
+`neg/sbb` collapse. WM_PAINT: `if (!GetUpdateRect(...)) break;` then BeginPaint/OnPaint/EndPaint/`return 0` (the far `je` to the
+shared epilogue plus an inline epilogue). The size check counts the four byte-indexed jump tables after the code (1600 bytes
+with tables vs the 996-byte code-only inventory entry).

@@ -28,6 +28,7 @@ public:
     int m_170;
 
     EzWindow();
+    LRESULT DefaultProc(UINT msg, WPARAM w, LPARAM l) { return DefWindowProc(m_160, msg, w, l); }
     virtual LRESULT WindowProc(UINT msg, WPARAM wParam, LPARAM lParam);
     virtual int OnCreate();
     virtual void OnDestroy();
