@@ -54,7 +54,7 @@ void M_00409ce0(int n);
 int M_00409d10();
 void M_00409d50(int a, int b, int c, int d);
 void M_00409db0();
-void M_00409700(int a, int b, int c);
+int M_00409700(int a, int b, int flag);
 int M_0040b430(int a, int b, int c);
 void M_0040b520(int a, int b, int c, int d);
 int M_0040b330(int a);
