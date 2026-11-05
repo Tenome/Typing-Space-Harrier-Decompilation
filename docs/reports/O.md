@@ -58,3 +58,15 @@ Bytes identical but reported DIFF only because of the function inventory: 0x4120
 | 0x40a6d0 | 205 vs 209 B | this in esi/zero constant hoisted to the function top in mine vs inside the branch in the original |
 | other lane-O entries (40d160, 40f720, 403940, 416350, 416440, 408660, 407310, 40ff90, 40fd10, 404... etc.) | not retried this round | |
 
+
+## Round 2
+Merged master first. New matches:
+
+| address | function | file | change |
+|---|---|---|---|
+| 0x413280 | `FUN_00413280` | O_lock2.cpp | same Lock loop as 0x413350: `while (1)` with early `return 0`, `rowSkip = lPitch - dwWidth` hoisted, fill written `end = line + width; while (line < end) *line++ = value;` (VC6 turns it into rep stos) |
+| 0x410460 | `Game::M_00410460` | O_snd2.cpp | the counting loop is `n = 0; for (i = 0; DAT_004e28dc[i] > 0; i++) n = i + 1;` (replaces the hand-peeled do/while with two induction variables) |
+
+Same counting idiom is in 0x403940 (`count = mode; for (i...) count = i + 1;` shrinks it to 562 B but the frame (mode in memory, 8-byte locals) still differs: 562 vs 569).
+
+Tried without success (best state): 0x40d160 (permuter 3 min best 56, constant 1 cached in ebx), 0x416350 (permuter best 29), 0x416440 (blit induction wall, unchanged), 0x40f720 / 0x40ff90 / 0x41ce30 / 0x4081b0 / 0x4043d0 / 0x409ce0 / 0x41cc80 / 0x406490 / 0x40a6d0 / 0x412b90 (register or frame walls, see round-1 table, no change). Not reached: 407310, 40fd10, 419e80, 41aef0, 41d9e0, 41df40, 4129a0, 414bd0, 411340, 408660 (large or low-score, would need a rewrite).
