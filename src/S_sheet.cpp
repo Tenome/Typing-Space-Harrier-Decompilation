@@ -5,7 +5,6 @@
 #include <ddraw.h>
 #include "game.h"
 
-// OPEN: register/spill order of the global snapshot differs (289 vs 279 bytes)
 SheetImage *FUN_00412ec0()
 {
     IDirectDrawSurface *surf = DAT_00a4a830;

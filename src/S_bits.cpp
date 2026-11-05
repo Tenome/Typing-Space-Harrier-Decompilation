@@ -21,24 +21,6 @@ int FUN_004121a0(StreamRec *stream)
     return (DAT_00a4a6e0 & mask) != 0;
 }
 
-void Game::M_004013b0()
-{
-    SeEntry *entry;
-
-    DAT_00901700 = DAT_004306e8;
-    if (*DAT_00901700->name != 0) {
-        do {
-            entry = DAT_00901700;
-            if (entry->id != 3)
-                FUN_0041e290(entry->id);
-            entry++;
-            DAT_00901700 = entry;
-        } while (*entry->name != 0);
-    }
-    M_004089a0(-1);
-}
-
-
 void Game::M_00405bd0()
 {
     int count;
@@ -62,24 +44,4 @@ void Game::M_00405bd0()
     DAT_00a23300 = last + 1;
     if (DAT_00a23300 > 10)
         DAT_00a23300 = 10;
-}
-
-
-int FUN_004121f0(int count)
-{
-    int value = 0;
-    int top;
-    unsigned int bit;
-
-    top = 1;
-    while (top * 2 < count) {
-        top *= 2;
-        value = FUN_004121a0(&DAT_00a4a680) + value * 2;
-    }
-    top *= 2;
-    if (value >= top - count) {
-        bit = FUN_004121a0(&DAT_00a4a680);
-        return value * 2 - top + (count + bit);
-    }
-    return value;
 }
