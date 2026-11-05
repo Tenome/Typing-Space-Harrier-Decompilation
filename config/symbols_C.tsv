@@ -1,0 +1,9 @@
+rand	0041f022
+fopen	0041f1c0
+fseek	0041f445
+ftell	0041f2ed
+fread	0041f205
+fclose	0041f040
+_filbuf	0041fa7c
+DirectSoundCreate	0041eea0
+_flsbuf	0041fb55

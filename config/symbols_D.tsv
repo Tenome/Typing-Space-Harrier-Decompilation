@@ -1,0 +1,5 @@
+mciChannelOpen	00a4b134
+mciCdOpen	00a4b0e0
+malloc	0041f57a
+free	0041f54b
+strtol	0041fec4

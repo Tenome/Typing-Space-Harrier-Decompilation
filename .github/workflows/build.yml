@@ -1,0 +1,51 @@
+name: Build
+
+# Visual C++ 6.0 and the original tsh.exe cannot be put on GitHub-hosted runners (neither is redistributable), so this job
+# runs on a self-hosted Windows runner that carries the label `vc6`. Configure these repository variables
+# (Settings > Secrets and variables > Actions > Variables):
+#   VC6_DIR        folder on the runner that contains VC98\            e.g. C:\Program Files (x86)\Microsoft Visual Studio
+#   TSH_ORIG_PATH  full path of the original tsh.exe on the runner     (SHA-1 185fec0816def349de984d6bdb402753004dfc1e)
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: [self-hosted, windows, vc6]
+    env:
+      VERSION: jp
+      VC6_DIR: ${{ vars.VC6_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python dependencies
+        shell: pwsh
+        run: python -m pip install -r requirements.txt
+
+      - name: Provide the original executable
+        shell: pwsh
+        run: |
+          if (-not "${{ vars.TSH_ORIG_PATH }}") { throw "Set the repository variable TSH_ORIG_PATH" }
+          New-Item -ItemType Directory -Force orig | Out-Null
+          Copy-Item "${{ vars.TSH_ORIG_PATH }}" orig/tsh.exe
+
+      - name: Build, compare with the original and write the report
+        shell: pwsh
+        run: python tools/build_all.py --data --report build/${{ env.VERSION }}/report.json --version ${{ env.VERSION }}
+
+      - name: Upload objdiff-format report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.VERSION }}_report
+          path: build/${{ env.VERSION }}/report.json
+
+      - name: Upload per-function results
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.VERSION }}_results
+          path: |
+            build/progress.tsv
+            build/results.tsv
+            build/progress_data.tsv

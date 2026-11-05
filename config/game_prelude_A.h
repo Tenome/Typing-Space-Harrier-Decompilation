@@ -1,0 +1,175 @@
+/* lane A: tables and globals used by the 0x401000-0x406d20 code */
+struct Field {
+    char m_0[0x640000];
+    char m_640000[0x140000];
+    char m_780000[0x5000];
+    int m_785000; int m_785004[0x4000]; int m_795004[0x4000]; int m_7a5004[0x4000]; int m_7b5004[0x81]; int m_7b5208; int m_7b520c[0x4000];
+    int  m_7c520c;
+    int m_7c5210[0x4000];
+    int  m_7d5210;
+    int  m_7d5214;
+    int  m_7d5218;
+    int  m_7d521c;
+    int  m_7d5220;
+    int  m_7d5224;
+    int  m_7d5228;
+    int  m_7d522c;
+    int  m_7d5230;
+    char m_pad7d5234[8];
+    int  m_7d523c;
+};
+
+extern int DAT_004bd54c[];
+extern int DAT_004bd574[];
+extern int DAT_004bd59c[];
+
+/* typed-key candidates of a slot: 12 entries of 6 chars at Slot+0x5094 (KEY_LEN) */
+enum { KEY_LEN = 6 };
+
+struct Obj_008f1000 {
+    Player m_players[4];
+    int  m_180;
+    int  m_184;
+    int  m_188;
+};
+extern Obj_008f1000 DAT_004efa40;
+extern Obj_008f1000 *DAT_008f1000;
+extern int DAT_00a46260;
+extern int DAT_00a460c8;
+
+enum { POS_NONE = -999999 };
+
+struct Rec_87cbd4 {
+    int m_0;
+    int m_4;
+    int m_8;
+    int m_c;
+    int m_10;
+    int m_14;
+    int m_18[5];
+    int m_2c[0x59];
+};
+
+
+extern int DAT_00a460bc;
+extern int DAT_004e1d94[];
+void __stdcall FUN_00401d70(int n, int *a, int *b);
+extern int DAT_00a46038;
+extern int DAT_00a46034;
+extern int DAT_004e1da8;
+extern int DAT_004e1dac[];
+
+struct RomajiEntry {
+    char kana[7];
+    char rom[4][7];
+    char pad23;
+};
+extern RomajiEntry DAT_00429040[0x19e];
+extern char *DAT_0043065c[];
+extern char DAT_00a461d0[];
+extern int DAT_0099d770;
+extern int DAT_004efbd8[];
+extern int DAT_008f069c[];
+extern char *DAT_004bdcdc[];
+extern char *DAT_004bdcc8[];
+extern int DAT_004bdd28[];
+extern int DAT_00a23308;
+extern int DAT_004efbe0;
+extern int DAT_008f06a4;
+extern int DAT_00a4603c;
+extern int DAT_00a46264[4];
+extern char DAT_00a461d0[];
+extern int DAT_00a460c4;
+extern int DAT_00a45e38;
+extern int DAT_004e1e90[8];
+struct Game;
+int  FUN_00404a10();
+extern int DAT_00a4625c;
+extern int DAT_00a46174;
+extern int DAT_00a46178;
+extern int DAT_00a4617c;
+extern int DAT_00a46180;
+extern int DAT_00a46040;
+extern char DAT_008f144c[];
+int FUN_00419e80();
+void FUN_0041a880();
+int  FUN_0041aef0(int key);
+extern short DAT_004bdab8[];
+extern short DAT_00a45e40[];
+
+struct Menu {
+    int   m_0;
+    int   m_4;
+    int   m_8[2];
+    int   m_10;
+    int   m_14[2];
+    int   m_1c[2];
+    int   m_24;
+    int   m_28;
+    int   m_2c;
+    int   m_30;
+    int   m_34;
+    int   m_38;
+    char *m_3c[0x20];
+};
+extern Menu  DAT_0099cfd8[8];
+extern Menu *DAT_00951fcc;
+extern int   DAT_00a3d700;
+extern int   DAT_008f0ff0;
+extern int   DAT_008f0ff8;
+extern int   DAT_008f100c;
+extern int   DAT_00951fc8;
+extern int   DAT_009016f0;
+extern int   DAT_009016f4;
+extern int   DAT_004efbcc;
+extern int   DAT_004efbd0;
+extern int   DAT_00a23300;
+extern int   DAT_00a23304;
+extern int   DAT_00a45e2c;
+extern int   DAT_00a45e30;
+extern int   DAT_00a45e3c;
+extern int   DAT_00a23310[0xcf];
+extern char *DAT_004bd85c[];
+extern char *DAT_004e1fd8;
+extern const char *DAT_004e2198[2];
+extern const char *DAT_004e2144[];
+extern char *DAT_004bdcc0[];
+extern char *DAT_004bd5c4[2];
+extern int DAT_004bd60c;
+extern int DAT_004bd610;
+extern char *DAT_004e1e80;
+extern char *DAT_004e1e84;
+extern char *DAT_004e1e88;
+extern char *DAT_004e1e8c;
+extern char *DAT_004bd858;
+extern char *DAT_004bd848[];
+extern short DAT_004bd924[];
+extern int DAT_00a3d6f4;
+extern char *DAT_004bd5cc[];
+extern char *DAT_004bd628[];
+extern char *DAT_004bd640[];
+extern char *DAT_004bd670[];
+extern char *DAT_004bd6a8[];
+extern char *DAT_004bd724[];
+extern int DAT_004bd6e8[];
+extern int DAT_004bd7a0[];
+extern char DAT_00a46054[];
+extern int DAT_00a46044;
+extern char *DAT_004bd834[];
+extern int DAT_0099d77c;
+extern int DAT_00a3d6fc;
+extern int DAT_008f141c;
+extern int DAT_004ef900;
+extern int DAT_00a3d708;
+extern int DAT_004e1eb0[];
+extern char *DAT_004e1ec0[];
+extern int DAT_004e1ee4[];
+extern char *DAT_004e1ef4[];
+extern int DAT_004e1f20[];
+extern char *DAT_004e1f34[];
+extern int DAT_004e1f68[];
+extern char *DAT_004e1f80[];
+extern int DAT_004e1fbc[];
+extern int DAT_004efbdc;
+extern int DAT_008f06a0;
+extern int DAT_0099d778;

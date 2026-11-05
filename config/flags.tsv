@@ -1,0 +1,4 @@
+# file<TAB>extra cl flags (VC6). /GX = C++ exception handling, needed for classes with SEH frames.
+E_app.cpp	/GX
+H_list.cpp	/GX
+M_app.cpp	/GX

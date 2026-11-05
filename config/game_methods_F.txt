@@ -1,0 +1,13 @@
+void M_00409190(int stage, int skip);
+void M_0040b850(int a, int b, float scale);
+void M_0040b8b0(int a, int b, int c, float scale);
+int M_00408ad0(int stage, int index);
+void M_00408b70(int stage);
+void M_00408320(int stage);
+int M_0040ba50(int mode, int a, int b, int c);
+void M_004090a0(int stage);
+void M_00407310(int group);
+void M_0040a7b0();
+void M_00408f60(int stage, int percent);
+void M_0040a270();
+void M_0040b140(int obj);

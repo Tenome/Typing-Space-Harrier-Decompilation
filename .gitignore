@@ -1,0 +1,29 @@
+# Original game binary and anything extracted from it (supply your own copy in orig/)
+orig/*
+!orig/README.md
+*.exe
+*.dll
+*.sys
+
+# Build outputs
+build/
+include/game.h
+include/*.tmp
+*.obj
+*.pdb
+*.ilk
+*.log
+
+# Data sources generated from the original exe by tools/data/gen_data.py
+src/K_*.cpp
+
+# Ghidra projects and exports (decompiler output of the original binary)
+*.gpr
+*.rep/
+
+# Python
+__pycache__/
+*.pyc
+
+# Scratch
+scratch/

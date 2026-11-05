@@ -1,0 +1,13 @@
+name	address
+exit	0041ff08
+srand	0041f018
+rand	0041f022
+sprintf	0041fc6a
+fopen	0041f1c0
+fclose	0041f040
+??2@YAPAXI@Z	0041ffdd
+?V16@TypingWindow@@UAEHH@Z	0041df40
+?V20@TypingWindow@@UAEXXZ	0041d9e0
+??_7TypingWindow@@6B@	004271f0
+??0EzWndClass@@QAE@PBDPAUHINSTANCE__@@@Z	0041ec30
+strncpy	0041eee0
