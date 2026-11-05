@@ -1,0 +1,6 @@
+int M_0040e570(int group, int first);
+void M_0040bfa0(int x, int y, char *text);
+void M_00408d00();
+void PruneStageSlots(int stage);
+void M_004078f0();
+void M_00401d70(int index, int *x, int *y);
