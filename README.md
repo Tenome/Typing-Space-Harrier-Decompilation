@@ -9,12 +9,12 @@ This repository contains no game files. You need your own copy of the game.
 
 | | |
 |---|---|
-| Game code (483 functions, 113,889 bytes) | **381 functions match** (78.9 %), 49,636 bytes |
+| Game code (504 functions, 115,572 bytes) | **384 functions match** (76.2 %), 52,167 bytes (45.1 % of the code) |
 | Initialised data | 771,252 bytes reproduced (generated from your exe, see below) |
 | C runtime (193 functions) | statically linked VC6 `libc.lib`, not decompiled |
 | Compiler | Visual C++ 6.0, cl 12.00.8168 (`/O2`), linker 6.00 |
 
-Open work: ~85 functions that differ only in register allocation or block layout, ~17 unstarted (mostly large, data-heavy
+Open work: ~87 functions that differ only in register allocation or block layout, ~33 unstarted (mostly large, data-heavy
 ones), the string-literal pool, the post-link junk bytes between functions, and the final link of the whole executable.
 See `docs/DECOMP_WORKFLOW.md` and `docs/reports/`.
 
@@ -52,12 +52,16 @@ script) are generated from your exe by `tools/data/gen_data.py` and are not comm
 
 ## Progress report and CI
 
-`.github/workflows/build.yml` builds everything and uploads `build/jp/report.json` as the artifact `jp_report`. The report follows
-the structure of objdiff's `report.json` (one unit per source file, unstarted functions as 0 % units); fuzzy percentages for
-non-matching functions come from our own instruction-level similarity, not objdiff's algorithm.
+The progress report is `progress/jp/report.json`, generated locally with
+`python tools/build_all.py --data --report progress/jp/report.json --version jp` and committed. `.github/workflows/report.yml`
+uploads it as the artifact `jp_report` on every push to `master`, which is what ByteMatch reads. It follows the structure of
+objdiff's `report.json` (one unit per source file, unstarted functions as 0 % units); fuzzy percentages for non-matching
+functions come from our own instruction-level similarity, not objdiff's algorithm. It holds only names, addresses, sizes and
+percentages.
 
-The workflow needs a **self-hosted Windows runner** with the label `vc6`, because neither VC6 nor the original executable can be
-placed on GitHub-hosted runners. Set the repository variables `VC6_DIR` and `TSH_ORIG_PATH` (see the comments in the workflow).
+Neither VC6 nor the original executable can be placed on GitHub-hosted runners, so the build itself is not run there.
+`.github/workflows/build.yml` (manual) rebuilds and verifies on a **self-hosted Windows runner** with the label `vc6`; set the
+repository variables `VC6_DIR` and `TSH_ORIG_PATH` (see the comments in the workflow).
 
 ## Notes on the game
 

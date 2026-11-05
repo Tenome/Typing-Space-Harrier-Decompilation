@@ -5,10 +5,9 @@ name: Build
 # (Settings > Secrets and variables > Actions > Variables):
 #   VC6_DIR        folder on the runner that contains VC98\            e.g. C:\Program Files (x86)\Microsoft Visual Studio
 #   TSH_ORIG_PATH  full path of the original tsh.exe on the runner     (SHA-1 185fec0816def349de984d6bdb402753004dfc1e)
+# Manual only (it waits forever when no such runner is online). The report that ByteMatch reads comes from report.yml;
+# run this job to verify the committed progress/jp/report.json against a fresh build.
 on:
-  push:
-    branches: [master]
-  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -35,10 +34,10 @@ jobs:
         shell: pwsh
         run: python tools/build_all.py --data --report build/${{ env.VERSION }}/report.json --version ${{ env.VERSION }}
 
-      - name: Upload objdiff-format report
+      - name: Upload the freshly built report
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.VERSION }}_report
+          name: ${{ env.VERSION }}_verified_report
           path: build/${{ env.VERSION }}/report.json
 
       - name: Upload per-function results
